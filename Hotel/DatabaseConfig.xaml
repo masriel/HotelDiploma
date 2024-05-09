@@ -80,38 +80,45 @@
                    Grid.Column="0"
                    Text="HOSTNAME"/>
         <TextBox Grid.Row="1"
-                 Grid.Column="1"/>
+                 Grid.Column="1"
+                 x:Name="HostnameText"/>
         
         <TextBlock Grid.Row="1"
                    Grid.Column="2"
                    Text="PORT"/>
         <TextBox Grid.Row="1"
-                 Grid.Column="3"/>
+                 Grid.Column="3"
+                 x:Name="PortText"/>
         
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
                    Text="USERNAME"/>
         <TextBox Grid.Row="2"
                  Grid.Column="1"
-                 Grid.ColumnSpan="3"/>
+                 Grid.ColumnSpan="3"
+                 x:Name="UsernameText"/>
         
         <TextBlock Grid.Row="3"
                    Grid.Column="0"
                    Text="PASSWORD"/>
         <PasswordBox Grid.Row="3"
                  Grid.Column="1"
-                 Grid.ColumnSpan="3"/>
+                 Grid.ColumnSpan="3"
+                 x:Name="PasswordText"/>
         
         <TextBlock Grid.Row="4"
                    Grid.Column="0"
                    Text="SCHEMA"/>
         <TextBox Grid.Row="4"
                  Grid.Column="1"
-                 Grid.ColumnSpan="3"/>
+                 Grid.ColumnSpan="3"
+                 x:Name="SchemaText"/>
         
         <Button Grid.Row="5"
                 Grid.Column="0"
                 Grid.ColumnSpan="4"
-                Content="СОХРАНИТЬ"/>
+                x:Name="SaveButton"
+                Content="СОХРАНИТЬ"
+                Click="SaveButton_OnClick"/>
     </Grid>
 </Window>
