@@ -3,10 +3,77 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Hotel"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="DatabaseConnectionSetup" Height="450" Width="800">
+        Title="Настройка подключения к базе" 
+        Height="400" Width="450"
+        ResizeMode="NoResize" WindowStyle="ToolWindow"
+        WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded">
+
+    <Window.Resources>
+        <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style TargetType="PasswordBox" BasedOn="{StaticResource MaterialDesignFloatingHintPasswordBox}">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style x:Key="MaterialDesignTitleTextBlock" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+            <Setter Property="Margin" Value="0 10"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
-        
+        <materialDesign:Card Padding="5" Margin="10">
+            <Grid ShowGridLines="False">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                           HorizontalAlignment="Center"
+                           Text="Настройка подключения"
+                           Style="{StaticResource MaterialDesignTitleTextBlock}"/>
+
+                <TextBox Grid.Row="1" Grid.Column="0"
+                         x:Name="HostnameText"
+                         materialDesign:HintAssist.Hint="Server"/>
+
+                <TextBox Grid.Row="1" Grid.Column="1"
+                         x:Name="PortText"
+                         materialDesign:HintAssist.Hint="Port"/>
+
+                <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                         x:Name="UsernameText"
+                         materialDesign:HintAssist.Hint="Username"/>
+
+                <PasswordBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                             x:Name="PasswordText"
+                         materialDesign:HintAssist.Hint="Password"/>
+
+                <TextBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+                         x:Name="SchemaText"
+                         materialDesign:HintAssist.Hint="Database"/>
+
+                <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                        x:Name="SaveButton"
+                        Content="СОХРАНИТЬ"
+                        Foreground="White"
+                        Click="SaveButton_Click"/>
+            </Grid>
+        </materialDesign:Card>
     </Grid>
+
 </Window>
