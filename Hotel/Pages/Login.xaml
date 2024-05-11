@@ -1,0 +1,157 @@
+﻿<Window x:Class="Hotel.Pages.Login"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Вход" Height="450" Width="300"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize" WindowStyle="None">
+
+    <Window.Resources>
+        <Style x:Key="MaterialDesignTitleTextBlock" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+            <Setter Property="Margin" Value="0 10"/>
+        </Style>
+        
+        <Style TargetType="TextBox" x:Key="MaterialDesignInputTextBox"
+               BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        
+        <Style TargetType="PasswordBox" x:Key="MaterialDesignPasswordBox"
+               BasedOn="{StaticResource MaterialDesignFloatingHintPasswordBox}">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+    </Window.Resources>
+    <Grid Background="#e5ccc9 ">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.7*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Button Grid.Row="0" Grid.Column="0"
+                x:Name="CloseButton"
+                Margin="5"
+                ToolTip="Icon"
+                BorderThickness="0"
+                Background="Transparent"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                Click="CloseButton_Click">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="Content" Value="{materialDesign:PackIcon Kind=Close}"/>
+                </Style>
+            </Button.Style>
+        </Button>
+
+        <TextBlock Grid.Row="0"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Bottom"
+                   Style="{StaticResource MaterialDesignTitleTextBlock}"
+                   Text="ВХОД В СИСТЕМУ"/>
+        <Border Grid.Row="0"
+                Background="#fdfdfd"
+                CornerRadius="100"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Margin="5"
+                Height="110"
+                Width="110">
+            <Grid>
+                <Ellipse Width="100"
+                         Height="100"
+                         StrokeThickness="4">
+                    <Ellipse.Stroke>
+                        <LinearGradientBrush>
+                            <GradientStop Color="#846267"
+                                  Offset="0.15"/>
+                            <GradientStop Color="#e0c1b3"
+                                  Offset="0.2"/>
+                            <GradientStop Color="#846267"
+                                  Offset="0.3"/>
+                            <GradientStop Color="#e0c1b3"
+                                  Offset="0.5"/>
+                            <GradientStop Color="#846267"
+                                  Offset="0.6"/>
+                            <GradientStop Color="#e0c1b3"
+                                  Offset="0.8"/>
+                            <GradientStop Color="#846267"
+                                  Offset="0.9"/>
+                        </LinearGradientBrush>
+                    </Ellipse.Stroke>
+                </Ellipse>
+                <materialDesign:PackIcon Kind="Account"
+                                 Width="70"
+                                 Height="70"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center">
+                    <materialDesign:PackIcon.Foreground>
+                        <LinearGradientBrush>
+                            <GradientStop Color="#846267"
+                                  Offset="0.5"/>
+                            <GradientStop Color="#e0c1b3"
+                                  Offset="0.4"/>
+                        </LinearGradientBrush>
+                    </materialDesign:PackIcon.Foreground>
+                </materialDesign:PackIcon>
+            </Grid>
+        </Border>
+
+        <materialDesign:Card Grid.Row="1"
+                             Margin="10 20" Padding="10"
+                             Background="#faf4f2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition Height="1.5*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width=".1*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                         x:Name="LoginText"
+                         Style="{StaticResource MaterialDesignInputTextBox}"/>
+
+                <PasswordBox Grid.Row="1" Grid.Column="0"
+                             x:Name="PasswordText"
+                             Visibility="Visible"
+                             Style="{StaticResource MaterialDesignPasswordBox}"/>
+                <TextBox Grid.Row="1" Grid.Column="0"
+                         x:Name="HelperBoxForPassword"
+                         Visibility="Collapsed"
+                         IsReadOnly="True"
+                         Style="{StaticResource MaterialDesignInputTextBox}"/>
+
+                <Button Grid.Row="1" Grid.Column="1"
+                        x:Name="ShowPwdButton"
+                        VerticalAlignment="Bottom"
+                        Margin="0 5"
+                        ToolTip="Icon"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Visibility="Visible"
+                        PreviewMouseLeftButtonDown="ShowPwdButton_MouseLeftButtonDown"
+                        PreviewMouseLeftButtonUp="ShowPwdButton_MouseLeftButtonUp">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Content" Value="{materialDesign:PackIcon Kind=Eye}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                        x:Name="LoginButton"
+                        Content="ВОЙТИ"
+                        Click="LoginButton_Click"/>
+            </Grid>
+        </materialDesign:Card>
+    </Grid>
+</Window>

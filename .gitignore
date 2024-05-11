@@ -3,3 +3,10 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+/Hotel/DatabaseConfig.xaml
+/.vs/Hotel
+/Hotel/DatabaseConfig.xaml.cs
+/Hotel/MainWindow.xaml
+/Hotel/MainWindow.xaml.cs
+/.vs/Hotel/v17/.suo
+/.vs/Hotel/v17/DocumentLayout.json

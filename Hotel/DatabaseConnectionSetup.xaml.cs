@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using Hotel.Classes;
 using Newtonsoft.Json;
+
+using Hotel.Classes;
+using Hotel.Pages;
+using System.Configuration;
 
 namespace Hotel
 {
@@ -11,6 +13,8 @@ namespace Hotel
     {
         private const string FILE_PATH = "db_config.json";
         private DatabaseConfig _databaseConfig;
+
+        private Navigation WINDOW_CHANGES;
 
         public DatabaseConnectionSetup()
         {
@@ -55,6 +59,9 @@ namespace Hotel
             string conn_string = $"Server={_databaseConfig.Server};Port={_databaseConfig.Port};Database={_databaseConfig.Database};Uid={_databaseConfig.Username};Pwd={_databaseConfig.Password};";
             ConnectionInfo info = new ConnectionInfo(conn_string);
             info.CheckConnection(conn_string);
+
+            WINDOW_CHANGES = new Navigation();
+            WINDOW_CHANGES.OpenAsNewPage(new Login(), this);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

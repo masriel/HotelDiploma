@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Windows;
 using MySql.Data.MySqlClient;
 
@@ -22,6 +23,8 @@ namespace Hotel.Classes
                     CONNECTION.Open();
                 }
                 MessageBox.Show("Вы подключились к базе.", "ПОДКЛЮЧЕНИЕ К БАЗЕ", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString = connectionString;
             }
             catch (Exception e)
             {

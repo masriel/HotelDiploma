@@ -2,7 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             StartupUri="DatabaseConnectionSetup.xaml">
+             StartupUri="Pages/Login.xaml"
+             >
+
+    <!--StartupUri="DatabaseConnectionSetup.xaml"-->
+
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
