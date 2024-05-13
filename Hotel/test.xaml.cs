@@ -12,28 +12,16 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Hotel.Pages
+namespace Hotel
 {
     /// <summary>
-    /// Interaction logic for Main.xaml
+    /// Interaction logic for test.xaml
     /// </summary>
-    public partial class Main : Window
+    public partial class test : Window
     {
-        private readonly int USER_TYPE = 0;
-        public Main(int type)
+        public test()
         {
             InitializeComponent();
-            USER_TYPE = type;
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            if(USER_TYPE == 1) ShowAdminControls();
-        }
-
-        private void ShowAdminControls()
-        {
-
         }
     }
 }

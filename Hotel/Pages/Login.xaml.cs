@@ -24,8 +24,8 @@ namespace Hotel.Pages
     /// </summary>
     public partial class Login : Window
     {
-        private string CONNECTION_STRING =
-            ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
+        private ReadConfigFile _config = new ReadConfigFile();
+        private string CONNECTION_STRING = String.Empty;
         private MySqlConnection CONNECTION;
         private MySqlCommand COMMAND;
 
@@ -35,6 +35,8 @@ namespace Hotel.Pages
         public Login()
         {
             InitializeComponent();
+
+            CONNECTION_STRING = _config.GetConnectionString();
         }
 
         private void ShowPwdButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -53,6 +55,7 @@ namespace Hotel.Pages
             this.Close();
         }
 
+        //показать/скрыть пароль
         private void ChangeVisibility(PasswordBox pwd, TextBox text, bool isShow)
         {
             if (isShow)
@@ -90,6 +93,7 @@ namespace Hotel.Pages
                         return;
                     }
 
+                    //проверка на правильность ввода
                     string checkLoginQuery = $"select count(*) from users where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
                     COMMAND = new MySqlCommand(checkLoginQuery, CONNECTION);
                     int loginCount = Convert.ToInt32(COMMAND.ExecuteScalar());
@@ -99,8 +103,20 @@ namespace Hotel.Pages
                         return;
                     }
 
+                    //определение типа пользователя
+                    string getUserType = $"select userType from users  where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
+                    int userType = 0;
+                    COMMAND = new MySqlCommand(getUserType, CONNECTION);
+                    object resultBack = COMMAND.ExecuteScalar();
+                    if(resultBack != null)
+                    {
+                        userType = Convert.ToInt32(resultBack);
+                    }
+                    MessageBox.Show(userType.ToString());
+
+                    //авторизация
                     MessageBox.Show("Вы успешно вошли в систему!", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Information);
-                    WINDOW_CHANGES.OpenAsNewPage(new Main(), this);
+                    WINDOW_CHANGES.OpenAsNewPage(new Main(userType), this);
                 }
             }
             catch(Exception ex)
@@ -109,6 +125,7 @@ namespace Hotel.Pages
             }
         }
 
+        //проверка на пустые поля
         private bool CheckFields(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) return false;
