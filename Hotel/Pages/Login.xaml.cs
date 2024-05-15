@@ -112,7 +112,7 @@ namespace Hotel.Pages
                     {
                         userType = Convert.ToInt32(resultBack);
                     }
-                    MessageBox.Show(userType.ToString());
+                    MessageBox.Show(userType.ToString(), "HelpMessage");
 
                     //авторизация
                     MessageBox.Show("Вы успешно вошли в систему!", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Information);

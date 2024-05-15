@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Resources;
-using System.Collections;
-using System.IO;
 using System.Windows;
 using MySql.Data.MySqlClient;
-using Resx.Resources;
 
 namespace Hotel.Classes
 {
     public class ConnectionInfo
     {
-        private ReadConfigFile CONFIG_FILE;
         public string CONNECTION_STRING = String.Empty;
         private MySqlConnection CONNECTION;
 

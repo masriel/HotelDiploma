@@ -113,11 +113,12 @@
 
         <TextBlock Grid.Row="1" Grid.Column="1"
                    HorizontalAlignment="Center"
-                   FontSize="36" FontWeight="Regular"
+                   VerticalAlignment="Center"
+                   FontSize="28" FontWeight="Regular"
                    Foreground="#7986CB"
-                   Text="Создание пользователя">
+                   Text="СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ">
             <TextBlock.Effect>
-                <DropShadowEffect Color="#1A237E" Direction="0" ShadowDepth="1.2" Opacity="0.8"/>
+                <DropShadowEffect Color="#1A237E" Direction="0" ShadowDepth="2" Opacity="0.8"/>
             </TextBlock.Effect>
         </TextBlock>
 

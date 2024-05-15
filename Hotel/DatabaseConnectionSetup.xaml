@@ -70,7 +70,7 @@
                 <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
                         x:Name="SaveButton"
                         Content="СОХРАНИТЬ"
-                        Foreground="White"
+                        Background="#5C6BC0"
                         Click="SaveButton_Click"/>
             </Grid>
         </materialDesign:Card>

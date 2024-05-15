@@ -164,7 +164,7 @@
                            FontSize="46" FontFamily="Montserrat"
                            FontWeight="Regular"
                            Foreground="#7986CB"
-                           Text="Вход в систему">
+                           Text="ВХОД В СИСТЕМУ">
                     <TextBlock.Effect>
                         <DropShadowEffect Color="#1A237E" Direction="0" ShadowDepth="2" Opacity="0.8"/>
                     </TextBlock.Effect>
