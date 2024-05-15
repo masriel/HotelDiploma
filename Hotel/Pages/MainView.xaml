@@ -8,8 +8,256 @@
         Title="Главная" Height="550" Width="800"
         MinHeight="550" MinWidth="800"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="SingleBorderWindow">
+        WindowStyle="None"
+        Background="#E8EAF6"
+        FontSize="18" FontFamily="Montserrat" Foreground="#5C6BC0">
+
+    <Window.Resources>
+        <Style TargetType="materialDesign:Card" x:Key="Card">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+        <Style TargetType="Border" x:Key="Icon">
+            <Setter Property="Background" Value="#fdfdfd"/>
+            <Setter Property="Height" Value="55"/>
+            <Setter Property="Width" Value="55"/>
+            <Setter Property="CornerRadius" Value="120"/>
+            <Setter Property="Margin" Value="10 0"/>
+            <Setter Property="Opacity" Value=".8"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="materialDesign:PackIcon" x:Key="PackIcon">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="TitleText">
+            <Setter Property="FontWeight" Value="ExtraBold"/>
+            <Setter Property="Foreground" Value="#5C6BC0"/>
+            <Setter Property="Margin" Value="0 10"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button x:Name="LogoutButton"
+                    ToolTip="Icon" 
+                    Height="30" Width="30"
+                    BorderThickness="0"
+                    Background="Transparent">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=Logout}"/>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button x:Name="HideButton"
+                    ToolTip="Icon" 
+                    Height="30" Width="30"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Click="HideButton_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=Minus}"/>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button x:Name="FullScreenButton"
+                    ToolTip="Icon" 
+                    Height="30" Width="30"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Visibility="Visible"
+                    Click="FullScreenButton_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=Fullscreen}"/>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button x:Name="SmallScreenButton"
+                    ToolTip="Icon" 
+                    Height="30" Width="30"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Visibility="Collapsed"
+                    Click="SmallScreenButton_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=FullscreenExit}"/>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button x:Name="CloseButton"
+                    ToolTip="Icon" 
+                    Height="30" Width="30"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Click="CloseButton_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=Close}"/>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+
+        <TextBlock Grid.Row="0" Grid.Column="0"
+                   Text="Имя сотрудника"
+                   Margin="10 0" HorizontalAlignment="Left"
+                   Style="{StaticResource TitleText}"/>
+
+        <materialDesign:Card Grid.Row="1" Grid.Column="0"
+                             Name="Clients"
+                             Style="{StaticResource Card}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width=".5*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0"
+                        Style="{StaticResource Icon}">
+                    <Grid>
+                        <materialDesign:PackIcon Kind="HumanMaleFemaleChild"
+                                                 Style="{StaticResource PackIcon}">
+                            <materialDesign:PackIcon.Foreground>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="#303F9F" Offset="0.5"/>
+                                    <GradientStop Color="#7986CB" Offset="0.4"/>
+                                </LinearGradientBrush>
+                            </materialDesign:PackIcon.Foreground>
+                        </materialDesign:PackIcon>
+                    </Grid>
+                </Border>
+                <TextBlock Grid.Column="1"
+                           Text="КЛИЕНТЫ"
+                           Margin="10 10 30 10"
+                           Style="{StaticResource TitleText}"/>
+            </Grid>
+        </materialDesign:Card>
+
+        <materialDesign:Card Grid.Row="1" Grid.Column="1"
+                             Name="Bookings"
+                             Style="{StaticResource Card}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width=".5*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0"
+                        Style="{StaticResource Icon}">
+                    <Grid>
+                        <materialDesign:PackIcon Kind="Bed"
+                                                 Style="{StaticResource PackIcon}">
+                            <materialDesign:PackIcon.Foreground>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="#303F9F" Offset="0.5"/>
+                                    <GradientStop Color="#7986CB" Offset="0.4"/>
+                                </LinearGradientBrush>
+                            </materialDesign:PackIcon.Foreground>
+                        </materialDesign:PackIcon>
+                    </Grid>
+                </Border>
+                <TextBlock Grid.Column="1"
+                           Text="ЗАСЕЛЕНИЕ"
+                           Margin="10 10 30 10"
+                           Style="{StaticResource TitleText}"/>
+            </Grid>
+        </materialDesign:Card>
+
+        <materialDesign:Card Grid.Row="1" Grid.Column="2"
+                             Name="CheckIn"
+                             Style="{StaticResource Card}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width=".4*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0"
+                        Style="{StaticResource Icon}">
+                    <Grid>
+                        <materialDesign:PackIcon Kind="BookMultiple"
+                                                 Style="{StaticResource PackIcon}">
+                            <materialDesign:PackIcon.Foreground>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="#303F9F" Offset="0.5"/>
+                                    <GradientStop Color="#7986CB" Offset="0.4"/>
+                                </LinearGradientBrush>
+                            </materialDesign:PackIcon.Foreground>
+                        </materialDesign:PackIcon>
+                    </Grid>
+                </Border>
+                <TextBlock Grid.Column="1"
+                           Text="БРОНИРОВАНИЕ"
+                           Style="{StaticResource TitleText}"/>
+            </Grid>
+        </materialDesign:Card>
+
+        <TextBox Grid.Row="2" Grid.Column="0"
+                    x:Name="SearchText"
+                    materialDesign:HintAssist.Hint="Название номера"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Margin="8"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+        <ComboBox Grid.Row="2" Grid.Column="1"
+                  x:Name="FilterBox"
+                  materialDesign:HintAssist.Hint="Фильтровать по"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Stretch"
+                  Margin="8"
+                  Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+            <ComboBoxItem Content="Кол-во свободных"/>
+            <ComboBoxItem Content="Площадь"/>
+            <ComboBoxItem Content="Кол-во жильцов"/>
+            <ComboBoxItem Content="Цена"/>
+        </ComboBox>
+        <StackPanel Grid.Row="2" Grid.Column="2"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Margin="8">
+            <Button x:Name="DescButton"
+                    ToolTip="Icon"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Width="40" Height="40">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=SortDescending}"/>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button x:Name="AscButton"
+                    ToolTip="Icon"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Width="40" Height="40">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=SortAscending}"/>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
     </Grid>
 </Window>

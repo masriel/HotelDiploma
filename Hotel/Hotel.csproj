@@ -209,12 +209,6 @@
     <Resource Include="hotel-app-icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\hotel-app.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\hotel-app-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\hotel-app-icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
