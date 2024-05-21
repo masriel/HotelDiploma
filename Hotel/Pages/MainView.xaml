@@ -10,7 +10,8 @@
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         Background="#E8EAF6"
-        FontSize="18" FontFamily="Montserrat" Foreground="#5C6BC0">
+        FontSize="18" FontFamily="Montserrat" Foreground="#5C6BC0"
+        Loaded="Window_Loaded">
 
     <Window.Resources>
         <Style TargetType="materialDesign:Card" x:Key="Card">
@@ -259,5 +260,81 @@
                 </Button.Style>
             </Button>
         </StackPanel>
+
+        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
+              ShowGridLines="True">
+
+            <ScrollViewer Style="{StaticResource MaterialDesignScrollViewer}">
+                <ItemsControl Name="Rooms">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="10">
+                                <materialDesign:Card>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height=".3*"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Image Grid.Row="1" Grid.Column="0"
+                                               Margin="5"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                                   Margin="15 3" VerticalAlignment="Center"
+                                                   FontWeight="ExtraBold" FontSize="46"
+                                                   Text="{Binding Type}"/>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="2"
+                                                   Margin="10"
+                                                   VerticalAlignment="Top"
+                                                   HorizontalAlignment="Right"
+                                                   FontWeight="Light" Foreground="#3949AB">
+                                            <Run Text="Свободных: "/>
+                                            <Run Text="10"/>
+                                        </TextBlock>
+
+                                        <materialDesign:Card Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                                             Margin="20 32" Background="#E8EAF6">
+                                            <Grid Margin="10">
+                                                <StackPanel Orientation="Vertical"
+                                                            VerticalAlignment="Top">
+                                                    <TextBlock FontSize="24" 
+                                                               TextWrapping="Wrap">
+                                                        <Run Text="{Binding Description}"/>
+                                                    </TextBlock>
+                                                    <TextBlock FontSize="24">
+                                                        <Run Text="Кол-во мест: "/>
+                                                        <Run Text="{Binding Occupancy}"/>
+                                                        <Run Text="чел."/>
+                                                    </TextBlock>
+                                                    <TextBlock FontSize="24">
+                                                        <Run Text="Площадь: "/>
+                                                        <Run Text="25"/>
+                                                        <Run Text="кв.м."/>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                                <TextBlock FontSize="22" FontWeight="Light" Foreground="#3949AB"
+                                                           VerticalAlignment="Bottom"
+                                                           HorizontalAlignment="Right">
+                                                    <Run Text="{Binding Cost}"/>
+                                                    <Run Text="руб/ночь"/>
+                                                </TextBlock>
+                                            </Grid>
+                                        </materialDesign:Card>
+                                    </Grid>
+                                </materialDesign:Card>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </Window>

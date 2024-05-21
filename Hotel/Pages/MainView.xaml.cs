@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hotel.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,6 +49,15 @@ namespace Hotel.Pages
             SmallScreenButton.Visibility = Visibility.Collapsed;
 
             this.WindowState = WindowState.Normal;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            List<Rooms> rooms = new List<Rooms>();
+            rooms.Add(new Rooms { Type = "Одноместный", Cost = "8000", Occupancy = "4", Description = "Description description description description description description description" });
+            rooms.Add(new Rooms { Type = "Одноместный", Cost = "8000", Occupancy = "4", Description = "Description description description description description description description" });
+            rooms.Add(new Rooms { Type = "Одноместный", Cost = "8000", Occupancy = "4", Description = "Description description description description description description description" });
+            Rooms.ItemsSource = rooms;
         }
     }
 }
