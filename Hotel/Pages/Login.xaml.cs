@@ -32,6 +32,8 @@ namespace Hotel.Pages
         private Navigation WINDOW_CHANGES = new Navigation();
         private HashPassword Security = new HashPassword();
 
+        private int TRY_COUNT;
+
         public Login()
         {
             InitializeComponent();
@@ -77,6 +79,8 @@ namespace Hotel.Pages
                 return; 
             }
 
+            if (TRY_COUNT <= 0) WINDOW_CHANGES.OpenAsDialog(new ItemControl.Captcha());
+
             try
             {
                 using(CONNECTION = new MySqlConnection(CONNECTION_STRING))
@@ -100,6 +104,13 @@ namespace Hotel.Pages
                     if (loginCount == 0)
                     {
                         MessageBox.Show("Неправильный логин или пароль.", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+                        TRY_COUNT--;
+
+                        if( TRY_COUNT == 0 )
+                        {
+                            BlockInputFieldsForDurationAsync(10000);
+                        }
+
                         return;
                     }
 
@@ -112,11 +123,11 @@ namespace Hotel.Pages
                     {
                         userType = Convert.ToInt32(resultBack);
                     }
-                    MessageBox.Show(userType.ToString(), "HelpMessage");
 
                     //авторизация
                     MessageBox.Show("Вы успешно вошли в систему!", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Information);
-                    WINDOW_CHANGES.OpenAsNewPage(new Main(userType), this);
+                    if (userType == 1) WINDOW_CHANGES.OpenAsNewPage(new AdminPanelView(), this);
+                    else WINDOW_CHANGES.OpenAsNewPage(new MainView(), this);
                 }
             }
             catch(Exception ex)
@@ -131,6 +142,35 @@ namespace Hotel.Pages
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) return false;
 
             return true;
+        }
+
+        private void LoginWin_Loaded(object sender, RoutedEventArgs e)
+        {
+            TRY_COUNT = 3;
+        }
+
+        private async Task BlockInputFieldsForDurationAsync(int milliseconds)
+        {
+            PasswordText.Password = String.Empty;
+            InputGrid.IsEnabled = false;
+            TimerText.Visibility = Visibility.Visible;
+
+            int seconds = milliseconds / 1000;
+
+            for (int i = 0; i < seconds; i++)
+            {
+                if (i == 0) 
+                {
+                    SecondsText.Text = $"{seconds - i}";
+                    await Task.Delay(1000);
+                    continue;
+                }
+                SecondsText.Text = $"0{seconds - i}";
+                await Task.Delay(1000);
+            }
+
+            InputGrid.IsEnabled = true;
+            TimerText.Visibility = Visibility.Collapsed;
         }
     }
 }
