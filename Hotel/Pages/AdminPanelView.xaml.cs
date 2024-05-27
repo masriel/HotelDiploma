@@ -21,9 +21,12 @@ namespace Hotel.Pages
     public partial class AdminPanelView : Window
     {
         private Navigation NAVIGATION = new Navigation();
+
+        private string PASSWORD = String.Empty;
         public AdminPanelView()
         {
             InitializeComponent();
+            PASSWORD = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -48,7 +51,7 @@ namespace Hotel.Pages
 
         private void DatabaseControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            MessageBox.Show("нажатие на управление бд");
+            NAVIGATION.OpenAsDialog(new AdminPanel.ControlDatabaseView(PASSWORD));
         }
     }
 }

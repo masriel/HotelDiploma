@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hotel.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using Hotel.Classes;
+using Hotel.ItemControl;
+
 namespace Hotel.AdminPanel
 {
     /// <summary>
@@ -19,9 +23,32 @@ namespace Hotel.AdminPanel
     /// </summary>
     public partial class ControlDatabaseView : Window
     {
-        public ControlDatabaseView()
+        private Navigation NAVIGATION = new Navigation();
+
+        private BackupDatabase BACKUP = new BackupDatabase();
+        private HashPassword Security = new HashPassword();
+
+        private string PASSWORD = String.Empty;
+
+        public ControlDatabaseView(string adminPassword)
         {
             InitializeComponent();
+            PASSWORD = adminPassword;
+        }
+
+        private void BackupButton_Click(object sender, RoutedEventArgs e)
+        {
+            PasswordWindow passwordWindow = new PasswordWindow();
+            if(passwordWindow.ShowDialog() == true)
+            {
+                string password = passwordWindow.Password;
+                if(password != PASSWORD)
+                {
+                    MessageBox.Show("Неверный пароль!", "ВВОД ПАРОЛЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                BACKUP.CreateBackup();
+            }
         }
     }
 }
