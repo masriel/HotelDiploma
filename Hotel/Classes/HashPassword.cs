@@ -31,5 +31,29 @@ namespace Hotel.Classes
             string hashedInput = HashPasswd(password);
             return string.Equals(hashedInput, hashedPassword);
         }
+
+        public string GeneratePassword(int length)
+        {
+            const string upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lowerCase = "abcdefghijklmnopqrstuvwxyz";
+            const string digits = "0123456789";
+            const string specialChars = "!@#$%^&*()_-+=<>?";
+
+            Random random = new Random();
+
+            StringBuilder password = new StringBuilder();
+            password.Append(upperCase[random.Next(upperCase.Length)]);
+            password.Append(lowerCase[random.Next(lowerCase.Length)]);
+            password.Append(digits[random.Next(digits.Length)]);
+            password.Append(specialChars[random.Next(specialChars.Length)]);
+
+            for (int i = password.Length; i < length; i++)
+            {
+                string allChars = upperCase + lowerCase + digits + specialChars;
+                password.Append(allChars[random.Next(allChars.Length)]);
+            }
+
+            return new string(password.ToString().OrderBy(c => random.Next()).ToArray());
+        }
     }
 }
