@@ -25,11 +25,12 @@ namespace Hotel.Pages
     public partial class Login : Window
     {
         private ReadConfigFile _config = new ReadConfigFile();
+
         private string CONNECTION_STRING = String.Empty;
         private MySqlConnection CONNECTION;
         private MySqlCommand COMMAND;
 
-        private Navigation WINDOW_CHANGES = new Navigation();
+        private Navigation NAVIGATION = new Navigation();
         private HashPassword Security = new HashPassword();
 
         private int TRY_COUNT;
@@ -37,8 +38,7 @@ namespace Hotel.Pages
         public Login()
         {
             InitializeComponent();
-
-            CONNECTION_STRING = _config.GetConnectionString();
+            CONNECTION_STRING = _config.GetConnectionString();  //получение строки подключения
         }
 
         private void ShowPwdButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -54,6 +54,7 @@ namespace Hotel.Pages
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            //спрашивать о выходе из приложения?
             this.Close();
         }
 
@@ -70,16 +71,18 @@ namespace Hotel.Pages
             pwd.Visibility = Visibility.Visible;
         }
 
+        //авторизация
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string USERNAME = LoginText.Text, PASSWORD = Security.HashPasswd(PasswordText.Password);
+
             if(!CheckFields(USERNAME, PASSWORD)) 
             {
                 MessageBox.Show("Все поля должны быть заполнены!", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
                 return; 
             }
 
-            if (TRY_COUNT <= 0) WINDOW_CHANGES.OpenAsDialog(new ItemControl.Captcha());
+            if (TRY_COUNT <= 0) NAVIGATION.OpenAsDialog(new ItemControl.Captcha());
 
             try
             {
@@ -126,8 +129,8 @@ namespace Hotel.Pages
 
                     //авторизация
                     MessageBox.Show("Вы успешно вошли в систему!", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Information);
-                    if (userType == 1) WINDOW_CHANGES.OpenAsNewPage(new AdminPanelView(), this);
-                    else WINDOW_CHANGES.OpenAsNewPage(new MainView(), this);
+                    if (userType == 1) NAVIGATION.OpenAsNewPage(new AdminPanelView(), this);
+                    else NAVIGATION.OpenAsNewPage(new MainView(), this);
                 }
             }
             catch(Exception ex)

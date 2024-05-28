@@ -31,11 +31,13 @@ namespace Hotel.Pages
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            //спрашивать о выходе?
             this.Close();
         }
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
+            //спрашивать о выходе?
             NAVIGATION.OpenAsNewPage(new Login(), this);
         }
 

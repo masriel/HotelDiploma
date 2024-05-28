@@ -6,7 +6,6 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Панель управления" Height="600" Width="350"
-        WindowStartupLocation="Manual"
         WindowStyle="ToolWindow" ResizeMode="NoResize"
         FontSize="18" FontFamily="Montserrat">
     <Grid>
@@ -126,13 +125,15 @@
                         x:Name="ImportButton"
                         Content="Импорт"
                         Margin="10"
-                        Background="#5C6BC0"/>
+                        Background="#5C6BC0"
+                        Click="ImportButton_Click"/>
 
                 <Button Grid.Column="1" Grid.Row="1"
                         x:Name="ExportButton"
                         Content="Экспорт"
                         Margin="10"
-                        Background="#5C6BC0"/>
+                        Background="#5C6BC0"
+                        Click="ExportButton_Click"/>
             </Grid>
         </materialDesign:Card>
 
@@ -177,7 +178,8 @@
                         x:Name="RestoreButton"
                         Content="ВЫПОЛНИТЬ"
                         Margin="10"
-                        Background="#5C6BC0"/>
+                        Background="#5C6BC0"
+                        Click="RestoreButton_Click"/>
             </Grid>
         </materialDesign:Card>
     </Grid>

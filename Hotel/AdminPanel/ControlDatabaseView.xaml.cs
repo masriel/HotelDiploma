@@ -48,6 +48,71 @@ namespace Hotel.AdminPanel
                     return;
                 }
                 BACKUP.CreateBackup();
+                MessageBox.Show("Резервное копирование базы данных выполнено успешно.", "РЕЗЕРВНОЕ КОПИРОВАНИЕ БАЗЫ ДАННЫХ", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void RestoreButton_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Filter = "SQL Files (*.sql)|*.sql|All Files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string backupFilePath = openFileDialog.FileName;
+
+                // Запрашиваем пароль перед восстановлением базы данных
+                PasswordWindow passwordWindow = new PasswordWindow();
+                if (passwordWindow.ShowDialog() == true)
+                {
+                    string password = passwordWindow.Password;
+                    if (password == PASSWORD)
+                    { 
+                        BACKUP.RestoreBackup(backupFilePath);
+                        MessageBox.Show("Восстановление базы данных выполнено успешно.", "ВОССТАНОВЛЕНИЕ БАЗЫ ДАННЫХ", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
+                    MessageBox.Show("Неверный пароль!", "ВВОД ПАРОЛЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            PasswordWindow passwordWindow = new PasswordWindow();
+            if (passwordWindow.ShowDialog() == true)
+            {
+                string password = passwordWindow.Password;
+                if (password == PASSWORD)
+                {
+                    BACKUP.ExportTable(new List<string> { "Users", "UserTypes" });
+                    MessageBox.Show("Экспорт таблицы выполнен успешно.", "ЭКПОРТ", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+                MessageBox.Show("Неверный пароль!", "ВВОД ПАРОЛЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ImportButton_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Filter = "SQL Files (*.sql)|*.sql|All Files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string backupFilePath = openFileDialog.FileName;
+
+                // Запрашиваем пароль перед импортом базы данных
+                PasswordWindow passwordWindow = new PasswordWindow();
+                if (passwordWindow.ShowDialog() == true)
+                {
+                    string password = passwordWindow.Password;
+                    if (password == PASSWORD)
+                    {
+                        BACKUP.ImportTable(backupFilePath);
+                        MessageBox.Show("Импорт таблицы выполнен успешно.", "ИМПОРТ", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
+                    MessageBox.Show("Неверный пароль!", "ВВОД ПАРОЛЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
     }

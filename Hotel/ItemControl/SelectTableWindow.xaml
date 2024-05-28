@@ -1,0 +1,148 @@
+﻿<Window x:Class="Hotel.ItemControl.SelectTableWindow"
+        x:Name="TableNameWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Выберите таблицу" Height="300" Width="530"
+        ResizeMode="NoResize" WindowStyle="ToolWindow"
+        FontSize="14" FontFamily="Montserrat">
+
+    <Window.Resources>
+        <Style TargetType="TextBlock" x:Key="TitleText">
+            <Setter Property="FontWeight" Value="ExtraBold"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Foreground" Value="#5C6BC0"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="materialDesign:Card" x:Key="Card">
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="Height" Value="100"/>
+            <Setter Property="Margin" Value="7"/>
+            <Setter Property="Opacity" Value=".8"/>
+        </Style>
+        <Style TargetType="materialDesign:PackIcon" x:Key="Icon">
+            <Setter Property="Width" Value="60"/>
+            <Setter Property="Height" Value="60"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Opacity" Value=".8"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+            <materialDesign:Card Name="Users"
+                                 Style="{StaticResource Card}">
+                <Grid>
+                    <Grid>
+                        <materialDesign:PackIcon Kind="AccountGroup"
+                                                 Width="60" Height="60"
+                                                 Style="{StaticResource Icon}">
+                            <materialDesign:PackIcon.Foreground>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="#303F9F" Offset="0.5"/>
+                                    <GradientStop Color="#7986CB" Offset="0.4"/>
+                                </LinearGradientBrush>
+                            </materialDesign:PackIcon.Foreground>
+                        </materialDesign:PackIcon>
+                    </Grid>
+                    <TextBlock Text="ПОЛЬЗОВАТЕЛИ"
+                               Style="{StaticResource TitleText}"/>
+                </Grid>
+            </materialDesign:Card>
+            <materialDesign:Card Name="Rooms"
+                                 Style="{StaticResource Card}">
+                <Grid>
+                    <Grid>
+                        <materialDesign:PackIcon Kind="Bed"
+                                                 Width="60" Height="60"
+                                                 Style="{StaticResource Icon}">
+                            <materialDesign:PackIcon.Foreground>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="#303F9F" Offset="0.5"/>
+                                    <GradientStop Color="#7986CB" Offset="0.4"/>
+                                </LinearGradientBrush>
+                            </materialDesign:PackIcon.Foreground>
+                        </materialDesign:PackIcon>
+                    </Grid>
+                    <TextBlock Text="НОМЕРА"
+                               Style="{StaticResource TitleText}"/>
+                </Grid>
+            </materialDesign:Card>
+            <materialDesign:Card Name="Meals"
+                                 Style="{StaticResource Card}">
+                <Grid>
+                    <Grid>
+                        <materialDesign:PackIcon Kind="Food"
+                                                 Width="60" Height="60"
+                                                 Style="{StaticResource Icon}">
+                            <materialDesign:PackIcon.Foreground>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="#303F9F" Offset="0.5"/>
+                                    <GradientStop Color="#7986CB" Offset="0.4"/>
+                                </LinearGradientBrush>
+                            </materialDesign:PackIcon.Foreground>
+                        </materialDesign:PackIcon>
+                    </Grid>
+                    <TextBlock Text="ПИТАНИЕ"
+                               Style="{StaticResource TitleText}"/>
+                </Grid>
+            </materialDesign:Card>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+            <materialDesign:Card Name="Clients"
+                                 Style="{StaticResource Card}">
+                <Grid>
+                    <Grid>
+                        <materialDesign:PackIcon Kind="HumanMaleFemaleChild"
+                                                 Width="60" Height="60"
+                                                 Style="{StaticResource Icon}">
+                            <materialDesign:PackIcon.Foreground>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="#303F9F" Offset="0.5"/>
+                                    <GradientStop Color="#7986CB" Offset="0.4"/>
+                                </LinearGradientBrush>
+                            </materialDesign:PackIcon.Foreground>
+                        </materialDesign:PackIcon>
+                    </Grid>
+                    <TextBlock Text="КЛИЕНТЫ"
+                               Style="{StaticResource TitleText}"/>
+                </Grid>
+            </materialDesign:Card>
+            <materialDesign:Card Name="Bookings"
+                                 Style="{StaticResource Card}">
+                <Grid>
+                    <Grid>
+                        <materialDesign:PackIcon Kind="BookMultiple"
+                                                 Width="60" Height="60"
+                                                 Style="{StaticResource Icon}">
+                            <materialDesign:PackIcon.Foreground>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="#303F9F" Offset="0.5"/>
+                                    <GradientStop Color="#7986CB" Offset="0.4"/>
+                                </LinearGradientBrush>
+                            </materialDesign:PackIcon.Foreground>
+                        </materialDesign:PackIcon>
+                    </Grid>
+                    <TextBlock Text="БРОНИРОВАНИЕ"
+                               Style="{StaticResource TitleText}"/>
+                </Grid>
+            </materialDesign:Card>
+        </StackPanel>
+    </Grid>
+</Window>

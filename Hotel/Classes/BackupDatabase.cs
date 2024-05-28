@@ -47,5 +47,91 @@ namespace Hotel.Classes
             }
         }
 
+        public void RestoreBackup(string backupPath)
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
+                {
+                    using (MySqlCommand cmd = new MySqlCommand())
+                    {
+                        using (MySqlBackup mb = new MySqlBackup(cmd))
+                        {
+                            cmd.Connection = conn;
+                            conn.Open();
+                            mb.ImportFromFile(backupPath);
+                            conn.Close();
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public void ImportTable(string backupPath)
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
+                {
+                    using (MySqlCommand cmd = new MySqlCommand())
+                    {
+                        using (MySqlBackup mb = new MySqlBackup(cmd))
+                        {
+                            cmd.Connection = conn;
+                            conn.Open();
+
+                            mb.ImportFromFile(backupPath);
+
+                            conn.Close();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public void ExportTable(List<string> tableNames)
+        {
+            CONFIG_INFO["path"] = Path.Combine(CONFIG_INFO["path"], $"{tableNames[0]}_BACKUPS");
+
+            if (!Directory.Exists(CONFIG_INFO["path"]))
+            {
+                Directory.CreateDirectory(CONFIG_INFO["path"]);
+            }
+
+            CONFIG_INFO["path"] = Path.Combine(CONFIG_INFO["path"], $"{tableNames[0]}_{DateTime.Now:yyyy_MM_dd_HH_mm}_BACKUP.sql");
+
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
+                {
+                    using (MySqlCommand cmd = new MySqlCommand())
+                    {
+                        using (MySqlBackup mb = new MySqlBackup(cmd))
+                        {
+                            cmd.Connection = conn;
+                            conn.Open();
+
+                            // Устанавливаем параметры для экспорта только одной таблицы
+                            mb.ExportInfo.TablesToBeExportedList = tableNames;
+                            mb.ExportToFile(CONFIG_INFO["path"]);
+
+                            conn.Close();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
 }

@@ -117,7 +117,6 @@ namespace Hotel.DatabaseControl
         private bool CheckFields(string username, string login, string password, int role)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password) || role == -1) return false;
-
             return true;
         }
 
