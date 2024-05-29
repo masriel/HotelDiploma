@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Hotel.ItemControl
 {
@@ -19,9 +9,51 @@ namespace Hotel.ItemControl
     /// </summary>
     public partial class SelectTableWindow : Window
     {
+        public List<string> Tables = new List<string>();
         public SelectTableWindow()
         {
             InitializeComponent();
+        }
+
+        private void Users_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Tables.Clear();
+            Tables.Add( "Users" );
+            Tables.Add( "UserTypes" );
+            DialogResult = true;
+        }
+
+        private void Rooms_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Tables.Clear();
+            Tables.Add("Rooms");
+            Tables.Add("RoomTypes");
+            DialogResult = true;
+        }
+
+        private void Meals_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Tables.Clear();
+            Tables.Add("Meals");
+            DialogResult = true;
+        }
+
+        private void Clients_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Tables.Clear();
+            Tables.Add("Clients");
+            Tables.Add("ClientPassport");
+            Tables.Add("BirthCertificate");
+            DialogResult = true;
+        }
+
+        private void Bookings_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Tables.Clear();
+            Tables.Add("Bookings");
+            Tables.Add("BookingClients");
+            Tables.Add("BookingMeals");
+            DialogResult = true;    
         }
     }
 }

@@ -39,7 +39,7 @@ namespace Hotel.Classes
                         }
                     }
                 }
-                MessageBox.Show("Резервное копирование выполнено успешно.", "РЕЗЕРВНОЕ КОПИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Information);
+                //MessageBox.Show("Резервное копирование выполнено успешно.", "РЕЗЕРВНОЕ КОПИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
@@ -99,7 +99,10 @@ namespace Hotel.Classes
 
         public void ExportTable(List<string> tableNames)
         {
-            CONFIG_INFO["path"] = Path.Combine(CONFIG_INFO["path"], $"{tableNames[0]}_BACKUPS");
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string backupDirectory = currentDirectory.Replace("Hotel\\bin\\Debug", "Backups");
+            CONFIG_INFO["path"] = Path.Combine(backupDirectory, $"{tableNames[0]}_BACKUPS");
+
 
             if (!Directory.Exists(CONFIG_INFO["path"]))
             {

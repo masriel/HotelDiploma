@@ -5,15 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
-using Hotel.Classes;
 using Hotel.ItemControl;
 
 namespace Hotel.AdminPanel
@@ -84,7 +76,11 @@ namespace Hotel.AdminPanel
                 string password = passwordWindow.Password;
                 if (password == PASSWORD)
                 {
-                    BACKUP.ExportTable(new List<string> { "Users", "UserTypes" });
+                    SelectTableWindow selectTable = new SelectTableWindow();
+                    if(selectTable.ShowDialog() == true)
+                    {
+                        BACKUP.ExportTable(selectTable.Tables);
+                    }
                     MessageBox.Show("Экспорт таблицы выполнен успешно.", "ЭКПОРТ", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }

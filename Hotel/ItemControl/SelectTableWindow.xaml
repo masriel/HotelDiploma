@@ -44,7 +44,8 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Center">
             <materialDesign:Card Name="Users"
-                                 Style="{StaticResource Card}">
+                                 Style="{StaticResource Card}"
+                                 PreviewMouseUp="Users_PreviewMouseUp">
                 <Grid>
                     <Grid>
                         <materialDesign:PackIcon Kind="AccountGroup"
@@ -63,7 +64,8 @@
                 </Grid>
             </materialDesign:Card>
             <materialDesign:Card Name="Rooms"
-                                 Style="{StaticResource Card}">
+                                 Style="{StaticResource Card}"
+                                 PreviewMouseUp="Rooms_PreviewMouseUp">
                 <Grid>
                     <Grid>
                         <materialDesign:PackIcon Kind="Bed"
@@ -82,7 +84,8 @@
                 </Grid>
             </materialDesign:Card>
             <materialDesign:Card Name="Meals"
-                                 Style="{StaticResource Card}">
+                                 Style="{StaticResource Card}"
+                                 PreviewMouseUp="Meals_PreviewMouseUp">
                 <Grid>
                     <Grid>
                         <materialDesign:PackIcon Kind="Food"
@@ -106,7 +109,8 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Center">
             <materialDesign:Card Name="Clients"
-                                 Style="{StaticResource Card}">
+                                 Style="{StaticResource Card}"
+                                 PreviewMouseUp="Clients_PreviewMouseUp">
                 <Grid>
                     <Grid>
                         <materialDesign:PackIcon Kind="HumanMaleFemaleChild"
@@ -125,7 +129,8 @@
                 </Grid>
             </materialDesign:Card>
             <materialDesign:Card Name="Bookings"
-                                 Style="{StaticResource Card}">
+                                 Style="{StaticResource Card}"
+                                 PreviewMouseUp="Bookings_PreviewMouseUp">
                 <Grid>
                     <Grid>
                         <materialDesign:PackIcon Kind="BookMultiple"

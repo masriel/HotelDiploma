@@ -1,7 +1,7 @@
 -- MySqlBackup.NET 2.3.8.0
--- Dump Time: 2024-05-28 14:03:30
+-- Dump Time: 2024-05-29 09:23:02
 -- --------------------------------------
--- Server version 5.6.51 MySQL Community Server (GPL)
+-- Server version 8.0.36 MySQL Community Server - GPL
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -24,5 +24,5 @@
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 
--- Dump completed on 2024-05-28 14:03:30
--- Total time: 0:0:0:0:110 (d:h:m:s:ms)
+-- Dump completed on 2024-05-29 09:23:03
+-- Total time: 0:0:0:0:402 (d:h:m:s:ms)
