@@ -14,127 +14,149 @@ namespace Hotel.Classes
 
         private Dictionary<string, string> CONFIG_INFO;
 
-        public BackupDatabase() 
+        public BackupDatabase()
         {
             CONFIG_INFO = _config.ReadFile();
             CONNECTION_STRING = _config.GetConnectionString();
         }
 
-        public void CreateBackup()
+        public bool CreateBackup()
         {
-            CONFIG_INFO["path"] = Path.Combine(CONFIG_INFO["path"], $"{CONFIG_INFO["database"]}_{DateTime.Now:yyyy_MM_dd_HH_mm}_BACKUP.sql");
-
-            try
+            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog
             {
-                using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
+                Filter = "SQL Files (*.sql)|*.sql|All Files (*.*)|*.*",
+                FileName = $"{CONFIG_INFO["database"]}_backup_{DateTime.Now:yyyy-MM-dd_HH-mm}.sql"
+            };
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string backupPath = saveFileDialog.FileName;
+                try
                 {
-                    using (MySqlCommand cmd = new MySqlCommand())
+                    using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
                     {
-                        using (MySqlBackup mb = new MySqlBackup(cmd))
+                        using (MySqlCommand cmd = new MySqlCommand())
                         {
-                            cmd.Connection = conn;
-                            conn.Open();
-                            mb.ExportToFile(CONFIG_INFO["path"]);
-                            conn.Close();
+                            using (MySqlBackup mb = new MySqlBackup(cmd))
+                            {
+                                cmd.Connection = conn;
+                                conn.Open();
+                                mb.ExportToFile(backupPath);
+                                conn.Close();
+                            }
                         }
                     }
+                    return true;
                 }
-                //MessageBox.Show("Резервное копирование выполнено успешно.", "РЕЗЕРВНОЕ КОПИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Information);
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            return false;
         }
 
-        public void RestoreBackup(string backupPath)
+        public bool RestoreBackup()
         {
-            try
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Filter = "SQL Files (*.sql)|*.sql|All Files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == true)
             {
-                using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
+                string backupFilePath = openFileDialog.FileName;
+                try
                 {
-                    using (MySqlCommand cmd = new MySqlCommand())
+                    using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
                     {
-                        using (MySqlBackup mb = new MySqlBackup(cmd))
+                        using (MySqlCommand cmd = new MySqlCommand())
                         {
-                            cmd.Connection = conn;
-                            conn.Open();
-                            mb.ImportFromFile(backupPath);
-                            conn.Close();
+                            using (MySqlBackup mb = new MySqlBackup(cmd))
+                            {
+                                cmd.Connection = conn;
+                                conn.Open();
+                                mb.ImportFromFile(backupFilePath);
+                                conn.Close();
+                            }
                         }
                     }
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            return false;
         }
 
-        public void ImportTable(string backupPath)
+        public bool ImportTable()
         {
-            try
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Filter = "SQL Files (*.sql)|*.sql|All Files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == true)
             {
-                using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
+                string backupFilePath = openFileDialog.FileName;
+                try
                 {
-                    using (MySqlCommand cmd = new MySqlCommand())
+                    using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
                     {
-                        using (MySqlBackup mb = new MySqlBackup(cmd))
+                        using (MySqlCommand cmd = new MySqlCommand())
                         {
-                            cmd.Connection = conn;
-                            conn.Open();
+                            using (MySqlBackup mb = new MySqlBackup(cmd))
+                            {
+                                cmd.Connection = conn;
+                                conn.Open();
 
-                            mb.ImportFromFile(backupPath);
+                                mb.ImportFromFile(backupFilePath);
 
-                            conn.Close();
+                                conn.Close();
+                            }
                         }
                     }
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            return false;
         }
 
-        public void ExportTable(List<string> tableNames)
+        public bool ExportTable(List<string> tableNames)
         {
-            string currentDirectory = Directory.GetCurrentDirectory();
-            string backupDirectory = currentDirectory.Replace("Hotel\\bin\\Debug", "Backups");
-            CONFIG_INFO["path"] = Path.Combine(backupDirectory, $"{tableNames[0]}_BACKUPS");
-
-
-            if (!Directory.Exists(CONFIG_INFO["path"]))
+            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog
             {
-                Directory.CreateDirectory(CONFIG_INFO["path"]);
-            }
+                Filter = "SQL Files (*.sql)|*.sql|All Files (*.*)|*.*",
+                FileName = $"{CONFIG_INFO["database"]}_backup_{DateTime.Now:yyyy-MM-dd_HH-mm}.sql"
+            };
 
-            CONFIG_INFO["path"] = Path.Combine(CONFIG_INFO["path"], $"{tableNames[0]}_{DateTime.Now:yyyy_MM_dd_HH_mm}_BACKUP.sql");
-
-            try
+            if (saveFileDialog.ShowDialog() == true)
             {
-                using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
+                try
                 {
-                    using (MySqlCommand cmd = new MySqlCommand())
+                    using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
                     {
-                        using (MySqlBackup mb = new MySqlBackup(cmd))
+                        using (MySqlCommand cmd = new MySqlCommand())
                         {
-                            cmd.Connection = conn;
-                            conn.Open();
+                            using (MySqlBackup mb = new MySqlBackup(cmd))
+                            {
+                                cmd.Connection = conn;
+                                conn.Open();
 
-                            // Устанавливаем параметры для экспорта только одной таблицы
-                            mb.ExportInfo.TablesToBeExportedList = tableNames;
-                            mb.ExportToFile(CONFIG_INFO["path"]);
+                                mb.ExportInfo.TablesToBeExportedList = tableNames;
+                                mb.ExportToFile(CONFIG_INFO["path"]);
 
-                            conn.Close();
+                                conn.Close();
+                            }
                         }
                     }
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            return false;
         }
     }
 }

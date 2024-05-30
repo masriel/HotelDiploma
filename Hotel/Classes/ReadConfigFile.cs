@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
-using Hotel.Classes;
 using System.IO;
 using System.Collections.Generic;
-using System;
 
 namespace Hotel.Classes
 {
@@ -18,8 +16,7 @@ namespace Hotel.Classes
             { "port", "" },
             { "database", "" },
             { "uid", "" },
-            { "pwd", "" },
-            { "path", "" },
+            { "pwd", "" }
         };
 
         public Dictionary<string, string> ReadFile()
@@ -35,15 +32,6 @@ namespace Hotel.Classes
             CONFIG_INFO["database"] = CONFIG.Database;
             CONFIG_INFO["uid"] = CONFIG.Username;
             CONFIG_INFO["pwd"] = CONFIG.Password;
-
-            string currentDirectory = Directory.GetCurrentDirectory();
-            string backupDirectory = currentDirectory.Replace("Hotel\\bin\\Debug", "Backups");
-            if (!Directory.Exists(backupDirectory))
-            {
-                Directory.CreateDirectory(backupDirectory);
-            }
-
-            CONFIG_INFO["path"] = backupDirectory;
 
             return CONFIG_INFO;
         }
