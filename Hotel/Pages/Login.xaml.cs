@@ -1,21 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 using MySql.Data.MySqlClient;
 using Hotel.Classes;
-using Hotel.Pages;
-using System.Configuration;
 
 namespace Hotel.Pages
 {
@@ -54,8 +44,7 @@ namespace Hotel.Pages
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            //спрашивать о выходе из приложения?
-            this.Close();
+            if(MessageBox.Show("Закрыть приложение?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) this.Close();
         }
 
         //показать/скрыть пароль
@@ -111,7 +100,7 @@ namespace Hotel.Pages
 
                         if( TRY_COUNT == 0 )
                         {
-                            BlockInputFieldsForDurationAsync(10000);
+                            _ = BlockInputFieldsForDurationAsync(10000);
                         }
 
                         return;
@@ -128,7 +117,6 @@ namespace Hotel.Pages
                     }
 
                     //авторизация
-                    MessageBox.Show("Вы успешно вошли в систему!", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Information);
                     if (userType == 1) NAVIGATION.OpenAsNewPage(new AdminPanelView(), this);
                     else NAVIGATION.OpenAsNewPage(new MainView(), this);
                 }

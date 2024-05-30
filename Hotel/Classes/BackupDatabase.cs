@@ -40,7 +40,9 @@ namespace Hotel.Classes
                             {
                                 cmd.Connection = conn;
                                 conn.Open();
+
                                 mb.ExportToFile(backupPath);
+
                                 conn.Close();
                             }
                         }
@@ -72,7 +74,9 @@ namespace Hotel.Classes
                             {
                                 cmd.Connection = conn;
                                 conn.Open();
+
                                 mb.ImportFromFile(backupFilePath);
+
                                 conn.Close();
                             }
                         }
@@ -128,7 +132,6 @@ namespace Hotel.Classes
                 Filter = "SQL Files (*.sql)|*.sql|All Files (*.*)|*.*",
                 FileName = $"{CONFIG_INFO["database"]}_backup_{DateTime.Now:yyyy-MM-dd_HH-mm}.sql"
             };
-
             if (saveFileDialog.ShowDialog() == true)
             {
                 try

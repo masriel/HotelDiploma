@@ -1,15 +1,16 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
 using System.Collections.Generic;
+using System;
 
 namespace Hotel.Classes
 {
 
-
     public class ReadConfigFile
     {
-        private string FILE_PATH = Directory.GetCurrentDirectory().Replace("Hotel\\bin\\Debug", "db_config.json");
+        private string FILE_PATH = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db_config.json");
         private ConfigData CONFIG;
+
         private Dictionary<string, string> CONFIG_INFO = new Dictionary<string, string>
         {
             { "server", "" },
@@ -47,5 +48,23 @@ namespace Hotel.Classes
             string conn_string = $"Server={CONFIG.Server};Port={CONFIG.Port};Database={CONFIG.Database};Uid={CONFIG.Username};Pwd={CONFIG.Password};";
             return conn_string;
         }
+
+        public ConfigData LoadConfig()
+        {
+            if (!File.Exists(FILE_PATH) || new FileInfo(FILE_PATH).Length == 0)
+            {
+                return null;
+            }
+
+            string json = File.ReadAllText(FILE_PATH);
+            return JsonConvert.DeserializeObject<ConfigData>(json);
+        }
+
+        public void SaveConfig(ConfigData config)
+        {
+            string json = JsonConvert.SerializeObject(config, Formatting.Indented);
+            File.WriteAllText(FILE_PATH, json);
+        }
     }
 }
+

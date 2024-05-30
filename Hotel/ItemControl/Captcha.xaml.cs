@@ -122,7 +122,6 @@ namespace Hotel.ItemControl
 
             if(InputText.Trim() == CAPTCHA_TEXT.Trim())
             {
-                MessageBox.Show("Капча написана правильно!", "ПРОВЕРКА", MessageBoxButton.OK, MessageBoxImage.Information);
                 this.Close();
                 return;
             }

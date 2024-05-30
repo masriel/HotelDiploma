@@ -20,6 +20,7 @@ namespace Hotel.Pages
     /// </summary>
     public partial class MainView : Window
     {
+        Navigation NAVIGATION = new Navigation();
         public MainView()
         {
             InitializeComponent();
@@ -27,7 +28,7 @@ namespace Hotel.Pages
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            if (MessageBox.Show("Закрыть приложение?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) this.Close();
         }
 
         private void FullScreenButton_Click(object sender, RoutedEventArgs e)
@@ -58,6 +59,11 @@ namespace Hotel.Pages
             rooms.Add(new Rooms { Type = "Одноместный", Cost = "8000", Occupancy = "4", Description = "Description description description description description description description" });
             rooms.Add(new Rooms { Type = "Одноместный", Cost = "8000", Occupancy = "4", Description = "Description description description description description description description" });
             Rooms.ItemsSource = rooms;
+        }
+
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Выйти из системы?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) NAVIGATION.OpenAsNewPage(new Login(), this);
         }
     }
 }

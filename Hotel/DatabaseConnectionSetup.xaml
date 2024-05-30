@@ -8,8 +8,7 @@
         Title="Настройка подключения к базе" 
         Height="400" Width="450"
         ResizeMode="NoResize" WindowStyle="ToolWindow"
-        WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded">
+        WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">

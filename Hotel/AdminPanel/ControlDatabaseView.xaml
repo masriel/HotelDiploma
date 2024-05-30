@@ -6,6 +6,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Панель управления" Height="600" Width="350"
+        WindowStartupLocation="CenterScreen"
         WindowStyle="ToolWindow" ResizeMode="NoResize"
         FontSize="18" FontFamily="Montserrat">
     <Grid>
@@ -13,6 +14,7 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <materialDesign:Card Grid.Row="0"
@@ -182,5 +184,14 @@
                         Click="RestoreButton_Click"/>
             </Grid>
         </materialDesign:Card>
+
+        <TextBlock Grid.Row="3"
+                   x:Name="ConfigConnectionButton"
+                   Text="Настроить подключение"
+                   Margin="0 0 0 10"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Bottom"
+                   Foreground="#969ecd"
+                   PreviewMouseUp="ConfigConnectionButton_Click"/>
     </Grid>
 </Window>

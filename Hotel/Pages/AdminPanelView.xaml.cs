@@ -31,14 +31,12 @@ namespace Hotel.Pages
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            //спрашивать о выходе?
-            this.Close();
+            if(MessageBox.Show("Закрыть приложение?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) this.Close();
         }
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-            //спрашивать о выходе?
-            NAVIGATION.OpenAsNewPage(new Login(), this);
+            if(MessageBox.Show("Выйти из системы?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) NAVIGATION.OpenAsNewPage(new Login(), this);
         }
 
         private void Users_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

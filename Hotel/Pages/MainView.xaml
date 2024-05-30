@@ -63,7 +63,8 @@
                     ToolTip="Icon" 
                     Height="30" Width="30"
                     BorderThickness="0"
-                    Background="Transparent">
+                    Background="Transparent"
+                    Click="LogoutButton_Click">
                 <Button.Style>
                     <Style TargetType="Button">
                         <Setter Property="Content" Value="{materialDesign:PackIcon Kind=Logout}"/>

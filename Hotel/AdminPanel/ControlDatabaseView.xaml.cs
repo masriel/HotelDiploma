@@ -1,12 +1,9 @@
-﻿using Hotel.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows;
 
 using Hotel.ItemControl;
+using Hotel.Classes;
+using Hotel.Pages;
 
 namespace Hotel.AdminPanel
 {
@@ -38,7 +35,7 @@ namespace Hotel.AdminPanel
                 {
                     if (BACKUP.CreateBackup())
                     {
-                        MessageBox.Show("Восстановление базы данных выполнено успешно.", "ВОССТАНОВЛЕНИЕ БАЗЫ ДАННЫХ", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Резервное копирование базы данных выполнено успешно.", "РЕЗЕРВНОЕ КОПИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Information);
                         return;
                     }
                     return;
@@ -105,6 +102,15 @@ namespace Hotel.AdminPanel
                     return;
                 }
                 MessageBox.Show("Неверный пароль!", "ВВОД ПАРОЛЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ConfigConnectionButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Вы уверены что хотите изменить настройки подключения?\nПриложение перезапустится.", "НАСТРОЙКА ПОДКЛЮЧЕНИЯ", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) 
+            {
+                DatabaseConnectionSetup databaseConnectionSetup = new DatabaseConnectionSetup();
+                NAVIGATION.OpenAsNewPage(databaseConnectionSetup, this);
             }
         }
     }
