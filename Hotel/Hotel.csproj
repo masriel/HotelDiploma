@@ -149,6 +149,9 @@
     <Compile Include="Classes\ConfigData.cs" />
     <Compile Include="Classes\ReadConfigFile.cs" />
     <Compile Include="Classes\Rooms.cs" />
+    <Compile Include="DatabaseControl\UsersView.xaml.cs">
+      <DependentUpon>UsersView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ItemControl\Captcha.xaml.cs">
       <DependentUpon>Captcha.xaml</DependentUpon>
     </Compile>
@@ -191,6 +194,10 @@
       <DependentUpon>DatabaseConnectionSetup.xaml</DependentUpon>
     </Compile>
     <Page Include="DatabaseControl\UserRegistration.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DatabaseControl\UsersView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

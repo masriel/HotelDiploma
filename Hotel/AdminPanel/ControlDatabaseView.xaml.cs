@@ -18,10 +18,14 @@ namespace Hotel.AdminPanel
         private HashPassword Security = new HashPassword();
 
         private string PASSWORD = String.Empty;
+        private string NAME = String.Empty;
 
-        public ControlDatabaseView(string adminPassword)
+        private bool RESTART = false;
+
+        public ControlDatabaseView(string name, string adminPassword)
         {
             InitializeComponent();
+            NAME = name;
             PASSWORD = adminPassword;
         }
 
@@ -94,7 +98,7 @@ namespace Hotel.AdminPanel
                 string password = passwordWindow.Password;
                 if (password == PASSWORD)
                 {
-                    if(BACKUP.ImportTable())
+                    if (BACKUP.ImportTable())
                     {
                         MessageBox.Show("Импорт таблицы выполнен успешно.", "ИМПОРТ", MessageBoxButton.OK, MessageBoxImage.Information);
                         return;
@@ -107,10 +111,19 @@ namespace Hotel.AdminPanel
 
         private void ConfigConnectionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Вы уверены что хотите изменить настройки подключения?\nПриложение перезапустится.", "НАСТРОЙКА ПОДКЛЮЧЕНИЯ", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) 
+            if (MessageBox.Show("Вы уверены что хотите изменить настройки подключения?\nПриложение нужно будет перезапустить.", "НАСТРОЙКА ПОДКЛЮЧЕНИЯ", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                DatabaseConnectionSetup databaseConnectionSetup = new DatabaseConnectionSetup();
-                NAVIGATION.OpenAsNewPage(databaseConnectionSetup, this);
+                RESTART = true;
+                NAVIGATION.OpenAsNewPage(new DatabaseConnectionSetup(), this);
+            }
+        }
+
+        private void DatabaseControlWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!RESTART)
+            {
+                AdminPanelView adminPanelView = new AdminPanelView(NAME, PASSWORD);
+                adminPanelView.Show();
             }
         }
     }

@@ -23,10 +23,12 @@ namespace Hotel.Pages
         private Navigation NAVIGATION = new Navigation();
 
         private string PASSWORD = String.Empty;
-        public AdminPanelView()
+        private string NAME = String.Empty;
+        public AdminPanelView(string name, string pwd)
         {
             InitializeComponent();
-            PASSWORD = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
+            PASSWORD = pwd;
+            NAME = name;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -51,7 +53,12 @@ namespace Hotel.Pages
 
         private void DatabaseControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            NAVIGATION.OpenAsDialog(new AdminPanel.ControlDatabaseView(PASSWORD));
+            NAVIGATION.OpenAsNewPage(new AdminPanel.ControlDatabaseView(NAME, PASSWORD), this);
+        }
+
+        private void AdminPanelWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            AdminNameText.Text = NAME;
         }
     }
 }

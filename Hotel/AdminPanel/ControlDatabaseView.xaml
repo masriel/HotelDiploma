@@ -1,4 +1,5 @@
 ﻿<Window x:Class="Hotel.AdminPanel.ControlDatabaseView"
+        x:Name="DatabaseControlWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,7 +9,8 @@
         Title="Панель управления" Height="600" Width="350"
         WindowStartupLocation="CenterScreen"
         WindowStyle="ToolWindow" ResizeMode="NoResize"
-        FontSize="18" FontFamily="Montserrat">
+        FontSize="18" FontFamily="Montserrat"
+        Closing="DatabaseControlWindow_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -33,18 +35,18 @@
                     VerticalAlignment="Center"
                     Margin="8 0">
                     <Grid>
-                    <materialDesign:PackIcon Kind="Backup"
+                        <materialDesign:PackIcon Kind="Backup"
                                             Width="60"
                                             Height="60"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center">
-                        <materialDesign:PackIcon.Foreground>
-                            <LinearGradientBrush>
-                                <GradientStop Color="#303F9F" Offset="0.5"/>
-                                <GradientStop Color="#7986CB" Offset="0.4"/>
-                            </LinearGradientBrush>
-                        </materialDesign:PackIcon.Foreground>
-                    </materialDesign:PackIcon>
+                            <materialDesign:PackIcon.Foreground>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="#303F9F" Offset="0.5"/>
+                                    <GradientStop Color="#7986CB" Offset="0.4"/>
+                                </LinearGradientBrush>
+                            </materialDesign:PackIcon.Foreground>
+                        </materialDesign:PackIcon>
                     </Grid>
                 </Border>
                 <TextBlock Grid.Row="0"
@@ -185,13 +187,15 @@
             </Grid>
         </materialDesign:Card>
 
-        <TextBlock Grid.Row="3"
-                   x:Name="ConfigConnectionButton"
-                   Text="Настроить подключение"
-                   Margin="0 0 0 10"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Bottom"
-                   Foreground="#969ecd"
-                   PreviewMouseUp="ConfigConnectionButton_Click"/>
+        <Button Grid.Row="3"
+                x:Name="ConfigConnectionButton"
+                Content="Настроить подключение"
+                Margin="0 0 0 10"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Foreground="#969ecd"
+                Background="Transparent"
+                BorderBrush="Transparent"
+                Click="ConfigConnectionButton_Click"/>
     </Grid>
 </Window>

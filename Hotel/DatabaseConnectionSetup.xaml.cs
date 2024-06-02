@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.Windows;
-using Newtonsoft.Json;
 
 using Hotel.Classes;
 using Hotel.Pages;
@@ -32,6 +30,7 @@ namespace Hotel
             configManager.SaveConfig(config);
 
             ConfigSaved?.Invoke(this, EventArgs.Empty);
+            this.Close();
         }
     }
 }

@@ -130,7 +130,7 @@ namespace Hotel.Classes
             Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog
             {
                 Filter = "SQL Files (*.sql)|*.sql|All Files (*.*)|*.*",
-                FileName = $"{CONFIG_INFO["database"]}_backup_{DateTime.Now:yyyy-MM-dd_HH-mm}.sql"
+                FileName = $"{tableNames[0]}_backup_{DateTime.Now:yyyy-MM-dd_HH-mm}.sql"
             };
             if (saveFileDialog.ShowDialog() == true)
             {

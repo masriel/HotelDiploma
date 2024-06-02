@@ -25,17 +25,20 @@ namespace Hotel.DatabaseControl
         private string CONNECTION_STRING = String.Empty;
         private MySqlConnection CONNECTION;
         private MySqlCommand COMMAND;
+        Navigation NAVIGATION = new Navigation();
 
         private HashPassword Security = new HashPassword();
 
-        public UserRegistration()
+        private string ID, NAME, LOGIN, TYPE;
+
+        public UserRegistration(string id, string name, string login, string type)
         {
             InitializeComponent();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            NAVIGATION.OpenAsNewPage(new UsersView(), this);
         }
 
         private void ShowPwdButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

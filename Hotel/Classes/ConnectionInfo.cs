@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Data;
 using System.Windows;
+
 using MySql.Data.MySqlClient;
 
 namespace Hotel.Classes
@@ -30,6 +32,25 @@ namespace Hotel.Classes
                 MessageBox.Show($"ОШИБКА:\n{e.Message}", "ПОДКЛЮЧЕНИЕ К БАЗЕ", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             return false;
+        }
+
+        public DataTable GetData(string query)
+        {
+            DataTable dataTable = new DataTable();
+
+            using (MySqlConnection connection = new MySqlConnection(CONNECTION_STRING))
+            {
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    connection.Open();
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                    {
+                        adapter.Fill(dataTable);
+                    }
+                }
+            }
+
+            return dataTable;
         }
     }
 }

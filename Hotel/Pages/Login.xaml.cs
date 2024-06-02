@@ -44,7 +44,7 @@ namespace Hotel.Pages
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            if(MessageBox.Show("Закрыть приложение?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) this.Close();
+            if (MessageBox.Show("Закрыть приложение?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) this.Close();
         }
 
         //показать/скрыть пароль
@@ -65,17 +65,17 @@ namespace Hotel.Pages
         {
             string USERNAME = LoginText.Text, PASSWORD = Security.HashPasswd(PasswordText.Password);
 
-            if(!CheckFields(USERNAME, PASSWORD)) 
+            if (!CheckFields(USERNAME, PASSWORD))
             {
                 MessageBox.Show("Все поля должны быть заполнены!", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
-                return; 
+                return;
             }
 
             if (TRY_COUNT <= 0) NAVIGATION.OpenAsDialog(new ItemControl.Captcha());
 
             try
             {
-                using(CONNECTION = new MySqlConnection(CONNECTION_STRING))
+                using (CONNECTION = new MySqlConnection(CONNECTION_STRING))
                 {
                     CONNECTION.Open();
 
@@ -83,7 +83,7 @@ namespace Hotel.Pages
                     string checkUserQuery = $"select count(*) from users where userEmail='{USERNAME}';";
                     COMMAND = new MySqlCommand(checkUserQuery, CONNECTION);
                     int userCount = Convert.ToInt32(COMMAND.ExecuteScalar());
-                    if(userCount == 0)
+                    if (userCount == 0)
                     {
                         MessageBox.Show("Пользователь не существует.", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
@@ -98,7 +98,7 @@ namespace Hotel.Pages
                         MessageBox.Show("Неправильный логин или пароль.", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
                         TRY_COUNT--;
 
-                        if( TRY_COUNT == 0 )
+                        if (TRY_COUNT == 0)
                         {
                             _ = BlockInputFieldsForDurationAsync(10000);
                         }
@@ -106,25 +106,37 @@ namespace Hotel.Pages
                         return;
                     }
 
+                    //получение имени пользователя
+                    string getUserName = $"select userName from users  where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
+                    COMMAND = new MySqlCommand(getUserName, CONNECTION);
+                    object resultBack = COMMAND.ExecuteScalar();
+                    string name = String.Empty;
+                    if (resultBack != null)
+                    {
+                        name = Convert.ToString(resultBack);
+                    }
+
                     //определение типа пользователя
                     string getUserType = $"select userType from users  where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
                     int userType = 0;
                     COMMAND = new MySqlCommand(getUserType, CONNECTION);
-                    object resultBack = COMMAND.ExecuteScalar();
-                    if(resultBack != null)
+                    resultBack = COMMAND.ExecuteScalar();
+                    if (resultBack != null)
                     {
                         userType = Convert.ToInt32(resultBack);
                     }
 
                     //авторизация
-                    if (userType == 1) NAVIGATION.OpenAsNewPage(new AdminPanelView(), this);
+                    if (userType == 1) NAVIGATION.OpenAsNewPage(new AdminPanelView(name, PASSWORD), this);
                     else NAVIGATION.OpenAsNewPage(new MainView(), this);
+
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            //NAVIGATION.OpenAsNewPage(new AdminPanelView(), this);
         }
 
         //проверка на пустые поля
@@ -150,7 +162,7 @@ namespace Hotel.Pages
 
             for (int i = 0; i < seconds; i++)
             {
-                if (i == 0) 
+                if (i == 0)
                 {
                     SecondsText.Text = $"{seconds - i}";
                     await Task.Delay(1000);

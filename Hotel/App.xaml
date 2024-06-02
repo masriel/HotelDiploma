@@ -2,13 +2,15 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             Startup="Application_Startup">
-
+             StartupUri="DatabaseControl/UsersView.xaml">
+    
+    <!--Startup="Application_Startup"-->
     <!--StartupUri="ItemControl\SelectTableWindow.xaml"-->
     <!--StartupUri="ItemControl\Captcha.xaml"-->
     <!--StartupUri="Pages\AdminPanelView.xaml"-->
     <!--StartupUri="AdminPanel/ControlDatabaseView.xaml"-->
     <!--StartupUri="DatabaseControl/UserRegistration.xaml"-->
+    <!--StartupUri="DatabaseControl/UsersView.xaml"-->
     <!--StartupUri="Pages/Login.xaml"-->
     <!--StartupUri="DatabaseConnectionSetup.xaml"-->
     <!--StartupUri="test.xaml"-->
