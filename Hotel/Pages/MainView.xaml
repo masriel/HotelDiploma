@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:Hotel.ItemControl"
         mc:Ignorable="d"
         Title="Главная" Height="550" Width="800"
         MinHeight="550" MinWidth="800"
@@ -262,80 +263,26 @@
             </Button>
         </StackPanel>
 
-        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
-              ShowGridLines="True">
-
-            <ScrollViewer Style="{StaticResource MaterialDesignScrollViewer}">
-                <ItemsControl Name="Rooms">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="10">
-                                <materialDesign:Card>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height=".3*"/>
-                                            <RowDefinition/>
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition/>
-                                            <ColumnDefinition/>
-                                            <ColumnDefinition/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <Image Grid.Row="1" Grid.Column="0"
-                                               Margin="5"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
-
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                                                   Margin="15 3" VerticalAlignment="Center"
-                                                   FontWeight="ExtraBold" FontSize="46"
-                                                   Text="{Binding Type}"/>
-
-                                        <TextBlock Grid.Row="0" Grid.Column="2"
-                                                   Margin="10"
-                                                   VerticalAlignment="Top"
-                                                   HorizontalAlignment="Right"
-                                                   FontWeight="Light" Foreground="#3949AB">
-                                            <Run Text="Свободных: "/>
-                                            <Run Text="10"/>
-                                        </TextBlock>
-
-                                        <materialDesign:Card Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
-                                                             Margin="20 32" Background="#E8EAF6">
-                                            <Grid Margin="10">
-                                                <StackPanel Orientation="Vertical"
-                                                            VerticalAlignment="Top">
-                                                    <TextBlock FontSize="24" 
-                                                               TextWrapping="Wrap">
-                                                        <Run Text="{Binding Description}"/>
-                                                    </TextBlock>
-                                                    <TextBlock FontSize="24">
-                                                        <Run Text="Кол-во мест: "/>
-                                                        <Run Text="{Binding Occupancy}"/>
-                                                        <Run Text="чел."/>
-                                                    </TextBlock>
-                                                    <TextBlock FontSize="24">
-                                                        <Run Text="Площадь: "/>
-                                                        <Run Text="25"/>
-                                                        <Run Text="кв.м."/>
-                                                    </TextBlock>
-                                                </StackPanel>
-                                                <TextBlock FontSize="22" FontWeight="Light" Foreground="#3949AB"
-                                                           VerticalAlignment="Bottom"
-                                                           HorizontalAlignment="Right">
-                                                    <Run Text="{Binding Cost}"/>
-                                                    <Run Text="руб/ночь"/>
-                                                </TextBlock>
-                                            </Grid>
-                                        </materialDesign:Card>
-                                    </Grid>
-                                </materialDesign:Card>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
+            <ItemsControl Name="Rooms">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.Template>
+                    <ControlTemplate>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsPresenter/>
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <local:RoomInfoControl/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </Grid>
     </Grid>
 </Window>

@@ -6,7 +6,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="800"
-             Background="White"
+             Background="Transparent"
              FontSize="18" FontFamily="Montserrat" 
              Foreground="#5C6BC0" FontWeight="Medium">
     <Grid>
@@ -30,7 +30,7 @@
                        HorizontalAlignment="Center"/>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                           Margin="15 3" Text="ROOM NAME"
+                           Margin="15 3" Text="{Binding Type}"
                            FontWeight="ExtraBold" FontSize="46"
                            VerticalAlignment="Center"/>
 
@@ -48,11 +48,11 @@
                         <StackPanel Orientation="Vertical"
                                     VerticalAlignment="Top">
                             <TextBlock FontSize="24" TextWrapping="Wrap">
-                            <Run Text="Description description description description description description description"/>
+                            <Run Text="{Binding Description}"/>
                             </TextBlock>
                             <TextBlock FontSize="24">
                             <Run Text="Кол-во мест: "/>
-                            <Run Text="4"/>
+                            <Run Text="{Binding Occupancy}"/>
                             <Run Text="чел."/>
                             </TextBlock>
                             <TextBlock FontSize="24">
@@ -65,7 +65,7 @@
                                    VerticalAlignment="Bottom"
                                    HorizontalAlignment="Right"
                                    Foreground="#3949AB">
-                            <Run Text="8000"/>
+                            <Run Text="{Binding Cost}"/>
                             <Run Text="руб/ночь"/>
                         </TextBlock>
                     </Grid>

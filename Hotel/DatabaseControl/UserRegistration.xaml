@@ -8,10 +8,11 @@
         xmlns:controls="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/controls"
         mc:Ignorable="d"
         Title="Создание нового пользователя" Height="337" Width="670"
-        WindowStartupLocation="Manual"
-        ResizeMode="NoResize" WindowStyle="None"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize" WindowStyle="ToolWindow"
         FontSize="13" FontFamily="Montserrat"
-        Loaded="AddUserWindow_Loaded">
+        Loaded="AddUserWindow_Loaded"
+        Closing="AddUserWindow_Closing">
 
     <Window.Resources>
         <Style TargetType="TextBox" x:Key="MaterialDesignInputTextBox"
@@ -26,7 +27,6 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height=".1*"/>
             <RowDefinition Height=".3*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
@@ -99,21 +99,7 @@
             </Grid>
         </Border>
 
-        <Button Grid.Row="0" Grid.Column="2"
-                ToolTip="Icon" x:Name="CloseButton"
-                HorizontalAlignment="Right"
-                Margin="3"
-                BorderThickness="0"
-                Background="Transparent"
-                Click="CloseButton_Click">
-            <Button.Style>
-                <Style TargetType="Button">
-                    <Setter Property="Content" Value="{materialDesign:PackIcon Kind=Close}"/>
-                </Style>
-            </Button.Style>
-        </Button>
-
-        <TextBlock Grid.Row="1" Grid.Column="1"
+        <TextBlock Grid.Row="0" Grid.Column="1"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    FontSize="28" FontWeight="Regular"
@@ -124,7 +110,7 @@
             </TextBlock.Effect>
         </TextBlock>
 
-        <materialDesign:Card Grid.Row="2" Grid.Column="1"
+        <materialDesign:Card Grid.Row="1" Grid.Column="1"
                              Margin="10 10 10 25" Padding="7">
             <Grid>
                 <Grid.RowDefinitions>

@@ -45,11 +45,6 @@ namespace Hotel.DatabaseControl
             IsEdit = isEdit;
         }
 
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            NAVIGATION.OpenAsNewPage(new UsersView(), this);
-        }
-
         private void ShowPwdButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             HelperBoxForPassword.Text = PasswordText.Password;
@@ -183,6 +178,11 @@ namespace Hotel.DatabaseControl
                 return;
             }
             EditUser(ID, USERNAME, LOGIN, PASSWORD, ROLE);
+        }
+
+        private void AddUserWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            this.Owner.Show();
         }
 
         private void AddUserWindow_Loaded(object sender, RoutedEventArgs e)

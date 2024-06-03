@@ -61,12 +61,6 @@ namespace Hotel.DatabaseControl
             Users.Columns[1].Header = "Имя пользователя";
             Users.Columns[2].Header = "Логин";
             Users.Columns[3].Header = "Тип пользователя";
-
-            // Растягиваем столбцы по ширине DataGrid
-            foreach (var column in Users.Columns)
-            {
-                column.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
-            }
         }
 
         private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
@@ -128,7 +122,11 @@ namespace Hotel.DatabaseControl
 
         private void AddUserButton_Click(object sender, RoutedEventArgs e)
         {
-            NAVIGATION.OpenAsNewPage(new UserRegistration(0, "", "", 0, false), this);
+            UserRegistration registration = new UserRegistration(0, "", "", 0, false);
+            registration.Owner = this;
+
+            this.Hide();
+            NAVIGATION.OpenAsDialog(registration);
         }
 
         private void DeleteUser_Click(object sender, RoutedEventArgs e)

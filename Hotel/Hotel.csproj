@@ -149,6 +149,18 @@
     <Compile Include="Classes\ConfigData.cs" />
     <Compile Include="Classes\ReadConfigFile.cs" />
     <Compile Include="Classes\Rooms.cs" />
+    <Compile Include="DatabaseControl\DatabaseView.xaml.cs">
+      <DependentUpon>DatabaseView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DatabaseControl\TabControl\BookingsView.xaml.cs">
+      <DependentUpon>BookingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DatabaseControl\TabControl\ClientsView.xaml.cs">
+      <DependentUpon>ClientsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DatabaseControl\TabControl\RoomsAndServicesView.xaml.cs">
+      <DependentUpon>RoomsAndServicesView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DatabaseControl\UsersView.xaml.cs">
       <DependentUpon>UsersView.xaml</DependentUpon>
     </Compile>
@@ -193,6 +205,22 @@
     <Compile Include="DatabaseConnectionSetup.xaml.cs">
       <DependentUpon>DatabaseConnectionSetup.xaml</DependentUpon>
     </Compile>
+    <Page Include="DatabaseControl\DatabaseView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DatabaseControl\TabControl\BookingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DatabaseControl\TabControl\ClientsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DatabaseControl\TabControl\RoomsAndServicesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DatabaseControl\UserRegistration.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -225,10 +253,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\Main.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Pages\MainView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -244,9 +268,6 @@
     </Compile>
     <Compile Include="Pages\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\Main.xaml.cs">
-      <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
