@@ -1,17 +1,9 @@
-﻿using Hotel.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
+using Hotel.DatabaseControl;
+using Hotel.Classes;
 
 namespace Hotel.Pages
 {
@@ -43,7 +35,7 @@ namespace Hotel.Pages
 
         private void Users_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            MessageBox.Show("нажатие на пользователей");
+            NAVIGATION.OpenAsDialog(new UsersView());
         }
 
         private void Database_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

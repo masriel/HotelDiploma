@@ -38,18 +38,25 @@ namespace Hotel.Classes
         {
             DataTable dataTable = new DataTable();
 
-            using (MySqlConnection connection = new MySqlConnection(CONNECTION_STRING))
+            try
             {
-                using (MySqlCommand command = new MySqlCommand(query, connection))
+                using (MySqlConnection connection = new MySqlConnection(CONNECTION_STRING))
                 {
-                    connection.Open();
-                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
-                        adapter.Fill(dataTable);
+                        connection.Open();
+                        using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                        {
+                            adapter.Fill(dataTable);
+                        }
                     }
                 }
             }
-
+            catch (Exception ex) 
+            {
+                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+                return null;
+            }
             return dataTable;
         }
     }

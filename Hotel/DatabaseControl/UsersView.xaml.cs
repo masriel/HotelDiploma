@@ -1,18 +1,12 @@
 ﻿using Hotel.Classes;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using MySql.Data.MySqlClient;
+using Hotel.Pages;
 
 namespace Hotel.DatabaseControl
 {
@@ -23,11 +17,15 @@ namespace Hotel.DatabaseControl
     {
         private string CONNECTION_STRING = String.Empty;
 
-        private ConnectionInfo db; 
+        private MySqlConnection CONNECTION;
+        private MySqlCommand COMMAND;
+
+        private ConnectionInfo db;
         private ReadConfigFile _config = new ReadConfigFile();
         Navigation NAVIGATION = new Navigation();
 
         private DataTable users = new DataTable();
+        private DataTable usersOriginal;
 
         public UsersView()
         {
@@ -38,38 +36,81 @@ namespace Hotel.DatabaseControl
 
         private void UsersWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            users = db.GetData("select userID, userName, userEmail, typeName from Users left join UserTypes on userType=typeID;");
-            Users.ItemsSource = users.DefaultView;
-
-            Users.Columns[0].Visibility = Visibility.Collapsed;
-
-            Users.Columns[1].Header = "Имя пользователя";
-            Users.Columns[2].Header = "Эл. почта";
-            Users.Columns[3].Header = "Тип пользователя";
+            LoadData();
         }
 
-        private void SearchText_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void LoadData()
+        {
+            users = db.GetData("select userID, userName, userEmail, typeName, typeID from Users left join UserTypes on userType=typeID;");
+            usersOriginal = users.Copy();
+
+            if (users != null)
+            {
+                Users.ItemsSource = users.DefaultView;
+                ConfigureDataGrid();
+            }
+        }
+
+        private void ConfigureDataGrid()
+        {
+            // Скрываем столбцы
+            Users.Columns[0].Visibility = Visibility.Collapsed;
+            Users.Columns[4].Visibility = Visibility.Collapsed;
+
+            // Устанавливаем заголовки
+            Users.Columns[1].Header = "Имя пользователя";
+            Users.Columns[2].Header = "Логин";
+            Users.Columns[3].Header = "Тип пользователя";
+
+            // Растягиваем столбцы по ширине DataGrid
+            foreach (var column in Users.Columns)
+            {
+                column.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
+            }
+        }
+
+        private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
         {
             string searchText = SearchText.Text.ToLower();
 
-            foreach (var row in Users.Items)
+            if (string.IsNullOrEmpty(searchText))
             {
-                DataGridRow dataGridRow = (DataGridRow)Users.ItemContainerGenerator.ContainerFromItem(row);
-                if (dataGridRow != null)
-                {
-                    DataRowView dataRowView = (DataRowView)dataGridRow.Item;
-                    string name = dataRowView[1].ToString().ToLower();
-                    string login = dataRowView[2].ToString().ToLower();
+                // Восстанавливаем исходную таблицу, если строка поиска пустая
+                Users.ItemsSource = usersOriginal.DefaultView;
+                ConfigureDataGrid();
+                return;
+            }
 
-                    if (name.Contains(searchText) || login.Contains(searchText))
-                    {
-                        dataGridRow.IsSelected = true;
-                    }
-                    else
-                    {
-                        dataGridRow.IsSelected = false;
-                    }
+            DataView dv = new DataView(usersOriginal);
+            dv.RowFilter = $"userName LIKE '%{searchText}%' OR userEmail LIKE '%{searchText}%'";
+
+            DataTable newTable = usersOriginal.Clone(); // Копируем структуру исходной таблицы
+
+            // Добавляем отфильтрованные строки в начало новой таблицы
+            foreach (DataRowView row in dv)
+            {
+                newTable.ImportRow(row.Row);
+            }
+
+            // Добавляем оставшиеся строки
+            foreach (DataRow row in usersOriginal.Rows)
+            {
+                string name = row["userName"].ToString().ToLower();
+                string login = row["userEmail"].ToString().ToLower();
+
+                if (!name.Contains(searchText) && !login.Contains(searchText))
+                {
+                    newTable.ImportRow(row);
                 }
+            }
+
+            Users.ItemsSource = newTable.DefaultView;
+            ConfigureDataGrid();
+
+            if (newTable.Rows.Count > 0)
+            {
+                Users.SelectedIndex = 0;
+                Users.ScrollIntoView(Users.SelectedItem);
             }
         }
 
@@ -87,7 +128,76 @@ namespace Hotel.DatabaseControl
 
         private void AddUserButton_Click(object sender, RoutedEventArgs e)
         {
-            NAVIGATION.OpenAsNewPage(new UserRegistration("", "", "", ""), this);
+            NAVIGATION.OpenAsNewPage(new UserRegistration(0, "", "", 0, false), this);
+        }
+
+        private void DeleteUser_Click(object sender, RoutedEventArgs e)
+        {
+            if (Users.SelectedItem != null)
+            {
+                DataRowView selectedRow = Users.SelectedItem as DataRowView;
+                if (selectedRow != null)
+                {
+                    int userId = Convert.ToInt32(selectedRow[0]);
+                    if (userId != 0)
+                    {
+                        if (MessageBox.Show($"Вы действительно хотите удалить пользователя {selectedRow[2]}/{selectedRow[1]}?", "УДАЛЕНИЕ", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                        {
+                            try
+                            {
+                                string query = $"delete from Users where userID={userId}";
+                                using (CONNECTION = new MySqlConnection(CONNECTION_STRING))
+                                {
+                                    CONNECTION.Open();
+
+                                    COMMAND = new MySqlCommand(query, CONNECTION);
+                                    COMMAND.ExecuteNonQuery();
+                                }
+
+                                LoadData();
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Users_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            DataGrid dataGrid = sender as DataGrid;
+            if (dataGrid != null && dataGrid.SelectedItem != null)
+            {
+                ContextMenu contextMenu = dataGrid.ContextMenu;
+                if (contextMenu != null)
+                {
+                    foreach (MenuItem item in contextMenu.Items)
+                    {
+                        item.IsEnabled = true;
+                    }
+                }
+            }
+        }
+
+        private void EditUser_Click(object sender, RoutedEventArgs e)
+        {
+            if (Users.SelectedItem != null)
+            {
+                DataRowView selectedRow = Users.SelectedItem as DataRowView;
+                if (selectedRow != null)
+                {
+                    int userId = Convert.ToInt32(selectedRow[0]), type = Convert.ToInt32(selectedRow[4]);
+                    string name = Convert.ToString(selectedRow[1]), login = Convert.ToString(selectedRow[2]);
+
+                    if (userId != 0)
+                    {
+                        NAVIGATION.OpenAsNewPage(new UserRegistration(userId, name, login, type, true), this);
+                    }
+                }
+            }
         }
     }
 }

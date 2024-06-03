@@ -29,6 +29,7 @@
             <Setter Property="CanUserDeleteRows" Value="False"/>
             <Setter Property="IsReadOnly" Value="True"/>
             <Setter Property="ColumnWidth" Value="*"/>
+            <Setter Property="SelectionMode" Value="Single"/>
         </Style>
     </Window.Resources>
 
@@ -43,9 +44,9 @@
                      materialDesign:HintAssist.Hint="Поиск"
                      Margin="8" FontSize="13"
                      DockPanel.Dock="Left"
-                     Width="250"
+                     Width="300"
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                     PreviewTextInput="SearchText_PreviewTextInput"/>
+                     TextChanged="SearchText_TextChanged"/>
             <Button x:Name="AddUserButton"
                     ToolTip="Icon"
                     BorderThickness="0"
@@ -67,14 +68,17 @@
             <Grid>
                 <DataGrid x:Name="Users"
                           Style="{StaticResource DataGridStyle}"
+                          ContextMenuOpening="Users_ContextMenuOpening"
                           PreviewMouseRightButtonUp="Users_PreviewMouseRightButtonUp">
                     <DataGrid.ContextMenu>
                         <ContextMenu Background="#F5F5F5"
                                      Style="{StaticResource MaterialDesignMenu}">
                             <MenuItem Header="УДАЛИТЬ"
-                                      Name="DeleteUser"/>
+                                      Name="DeleteUser"
+                                      Click="DeleteUser_Click"/>
                             <MenuItem Header="РЕДАКТИРОВАТЬ"
-                                      Name="EditUser"/>
+                                      Name="EditUser"
+                                      Click="EditUser_Click"/>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                 </DataGrid>

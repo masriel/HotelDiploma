@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Hotel.DatabaseControl
 {
@@ -29,11 +30,19 @@ namespace Hotel.DatabaseControl
 
         private HashPassword Security = new HashPassword();
 
-        private string ID, NAME, LOGIN, TYPE;
+        private int ID, TYPE;
+        private string NAME, LOGIN;
+        private bool IsEdit = false;
 
-        public UserRegistration(string id, string name, string login, string type)
+        public UserRegistration(int id, string name, string login, int type, bool isEdit)
         {
             InitializeComponent();
+
+            ID = id;
+            NAME = name;
+            LOGIN = login;
+            TYPE = type;
+            IsEdit = isEdit;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -125,58 +134,98 @@ namespace Hotel.DatabaseControl
 
         private void AddUserButton_Click(object sender, RoutedEventArgs e)
         {
-            string USERNAME = UsernameText.Text, LOGIN = EmailText.Text, PASSWORD = PasswordText.Password;
-            int ROLE = UserRole.SelectedIndex;
-            if(!CheckFields(USERNAME, LOGIN, PASSWORD, ROLE))
+            string USERNAME = UsernameText.Text, LOGIN = EmailText.Text, PASSWORD = Security.HashPasswd(PasswordText.Password);
+            int ROLE = UserRole.SelectedIndex == 0 ? 1 : 2;
+
+            if (!IsEdit)
             {
-                MessageBox.Show("Все поля должны быть заполнены!", "ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (!CheckFields(USERNAME, LOGIN, PASSWORD, ROLE))
+                {
+                    MessageBox.Show("Все поля должны быть заполнены!", "ДОБАВЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                try
+                {
+                    using (CONNECTION = new MySqlConnection(CONNECTION_STRING))
+                    {
+                        CONNECTION.Open();
+
+                        string checkNewUserQuery = $"select count(*) from users where userEmail='{LOGIN}';";
+                        COMMAND = new MySqlCommand(checkNewUserQuery, CONNECTION);
+                        int userCount = Convert.ToInt32(COMMAND.ExecuteScalar());
+                        if (userCount != 0)
+                        {
+                            MessageBox.Show("Пользователь уже существует.", "ДОБАВЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+
+                        string addNewUser = $"insert into users (userName, userEmail, userPassword, userType) values ('{USERNAME}','{LOGIN}','{PASSWORD}',{ROLE}); select LAST_INSERT_ID();";
+                        COMMAND = new MySqlCommand(addNewUser, CONNECTION);
+                        object newUserID = Convert.ToInt32(COMMAND.ExecuteScalar());
+                        if (newUserID == null || newUserID == DBNull.Value)
+                        {
+                            MessageBox.Show("Произошла ошибка при добавлении пользователя.", "ДОБАВЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                        MessageBox.Show("Пользователь успешно добавлен.", "ДОБАВЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        UsernameText.Text = String.Empty;
+                        EmailText.Text = String.Empty;
+                        PasswordText.Password = String.Empty;
+                        UserRole.SelectedIndex = -1;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
                 return;
             }
-
-            PASSWORD = Security.HashPasswd(PasswordText.Password);
-            if (ROLE == 0) ROLE = 1;
-            else ROLE = 2;
-
-            try
-            {
-                using(CONNECTION = new MySqlConnection(CONNECTION_STRING))
-                {
-                    CONNECTION.Open();
-
-                    string checkNewUserQuery = $"select count(*) from users where userEmail='{LOGIN}';";
-                    COMMAND = new MySqlCommand(checkNewUserQuery, CONNECTION);
-                    int userCount = Convert.ToInt32(COMMAND.ExecuteScalar());
-                    if(userCount != 0)
-                    {
-                        MessageBox.Show("Пользователь уже существует.", "ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-
-                    string addNewUser = $"insert into users (userName, userEmail, userPassword, userType) values ('{USERNAME}','{LOGIN}','{PASSWORD}',{ROLE}); select LAST_INSERT_ID();";
-                    COMMAND = new MySqlCommand(addNewUser, CONNECTION);
-                    object newUserID = Convert.ToInt32(COMMAND.ExecuteScalar());
-                    if(newUserID == null ||  newUserID == DBNull.Value)
-                    {
-                        MessageBox.Show("Произошла ошибка при добавлении пользователя.", "ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-                    MessageBox.Show("Пользователь успешно добавлен.", "ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                    UsernameText.Text = String.Empty;
-                    EmailText.Text = String.Empty;
-                    PasswordText.Password = String.Empty;
-                    UserRole.Text = String.Empty;
-                }
-            }
-            catch (Exception ex) 
-            {
-                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            EditUser(ID, USERNAME, LOGIN, PASSWORD, ROLE);
         }
 
         private void AddUserWindow_Loaded(object sender, RoutedEventArgs e)
         {
             CONNECTION_STRING = _config.GetConnectionString();
+
+            UsernameText.Text = NAME;
+            EmailText.Text = LOGIN;
+            UserRole.SelectedIndex = TYPE != 0 ? TYPE - 1 : -1;
+            AddUserButton.Content = IsEdit ? "РЕДАКТИРОВАТЬ" : "ДОБАВИТЬ";
+        }
+
+        private void EditUser(int id, string name, string login, string password, int role)
+        {
+            if (!CheckFields(name, login, password, role))
+            {
+                MessageBox.Show("Все поля должны быть заполнены!", "РЕДАКТИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            try
+            {
+                using (CONNECTION = new MySqlConnection(CONNECTION_STRING))
+                {
+                    CONNECTION.Open();
+
+                    string editUser = $"update Users set userName='{name}', userEmail='{login}', userPassword='{password}', userType={role} where userID={id}";
+                    COMMAND = new MySqlCommand(editUser, CONNECTION);
+                    int rowsAffected = COMMAND.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        MessageBox.Show("Данные пользователя успешно обновлены.", "РЕДАКТИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Information);
+                        NAVIGATION.OpenAsNewPage(new UsersView(), this);
+                        return;
+                    }
+                    MessageBox.Show("Произошла ошибка при редактировании пользователя.", "РЕДАКТИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
