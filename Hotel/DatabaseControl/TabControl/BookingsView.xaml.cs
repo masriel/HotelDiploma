@@ -47,14 +47,18 @@ namespace Hotel.DatabaseControl.TabControl
 
         private void LoadData()
         {
-            bookings = db.GetData("select bookingClientsID, client, bookingID, arrivalDate, departureDate, room, bookingMealID, meal, quantity " +
+            bookings = db.GetData("select bookingClientsID, BookingClients.booking, client, bookingNumber, DATE_FORMAT(arrivalDate, '%d.%m.%Y') as arrivalDate, DATE_FORMAT(departureDate, '%d.%m.%Y') as departureDate, room, meal, quantity, mealName, mealCost, roomNumber, roomType, firstName, lastName, middleName, birthDate, phoneNumber, email, passport, birthCertificate " +
                 "from BookingClients " +
-                "left join Bookings on BookingClients.booking=bookingID " +
-                "left join BookingMeals on BookingClients.booking=bookingID;");
-            bookingsOriginal = bookings.Copy();
+                "left join Bookings on BookingClients.booking = bookingID " +
+                "left join BookingMeals on BookingClients.booking = bookingID " +
+                "left join Meals on meal = mealID " +
+                "left join Rooms on room = roomID " +
+                "left join Clients on client = clientID " +
+                " order by bookingNumber;");
 
             if (bookings != null)
             {
+                bookingsOriginal = bookings.Copy();
                 Bookings.ItemsSource = bookings.DefaultView;
                 ConfigureDataGrid();
             }
@@ -64,13 +68,86 @@ namespace Hotel.DatabaseControl.TabControl
         {
             foreach (DataGridColumn column in Bookings.Columns)
             {
-                
+                switch (column.Header.ToString())
+                {
+                    case "bookingNumber":
+                        column.Header = "Рег. номер";
+                        break;
+                    case "arrivalDate":
+                        column.Header = "Заселение";
+                        break;
+                    case "departureDate":
+                        column.Header = "Выселение";
+                        break;
+                    case "lastName":
+                        column.Header = "Фамилия";
+                        break;
+                    case "firstName":
+                        column.Header = "Имя";
+                        break;
+                    case "phoneNumber":
+                        column.Header = "Телефон";
+                        break;
+                    case "roomNumber":
+                        column.Header = "Комната";
+                        break;
+                    case "mealName":
+                        column.Header = "Питание";
+                        break;
+                    default:
+                        column.Visibility = Visibility.Collapsed;
+                        break;
+                }
             }
         }
 
         private void BookingsWindow_Loaded(object sender, RoutedEventArgs e)
         {
             LoadData();
+        }
+
+        private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string searchText = SearchText.Text.ToLower();
+
+            if (string.IsNullOrEmpty(searchText))
+            {
+                // Восстанавливаем исходную таблицу, если строка поиска пустая
+                Bookings.ItemsSource = bookingsOriginal.DefaultView;
+                ConfigureDataGrid();
+                return;
+            }
+
+            DataView dv = new DataView(bookingsOriginal);
+            dv.RowFilter = $"bookingNumber LIKE '%{searchText}%'";
+
+            DataTable newTable = bookingsOriginal.Clone(); // Копируем структуру исходной таблицы
+
+            // Добавляем отфильтрованные строки в начало новой таблицы
+            foreach (DataRowView row in dv)
+            {
+                newTable.ImportRow(row.Row);
+            }
+
+            // Добавляем оставшиеся строки
+            foreach (DataRow row in bookingsOriginal.Rows)
+            {
+                string name = row["bookingNumber"].ToString().ToLower();
+
+                if (!name.Contains(searchText))
+                {
+                    newTable.ImportRow(row);
+                }
+            }
+
+            Bookings.ItemsSource = newTable.DefaultView;
+            ConfigureDataGrid();
+
+            if (newTable.Rows.Count > 0)
+            {
+                Bookings.SelectedIndex = 0;
+                Bookings.ScrollIntoView(Bookings.SelectedItem);
+            }
         }
     }
 }

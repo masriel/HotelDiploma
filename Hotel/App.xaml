@@ -5,6 +5,7 @@
              StartupUri="DatabaseControl/DatabaseView.xaml">
     
     <!--Startup="Application_Startup"-->
+    <!--StartupUri="DatabaseControl/RoomEdit.xaml"-->
     <!--StartupUri="ItemControl\SelectTableWindow.xaml"-->
     <!--StartupUri="ItemControl\Captcha.xaml"-->
     <!--StartupUri="Pages\AdminPanelView.xaml"-->

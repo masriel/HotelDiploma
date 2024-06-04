@@ -1,4 +1,5 @@
 ﻿<Window x:Class="Hotel.DatabaseControl.DatabaseView"
+        x:Name="DatabaseWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,7 +7,7 @@
         xmlns:local="clr-namespace:Hotel.DatabaseControl.TabControl"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="База данных" Height="600" Width="800"
+        Title="База данных" Height="600" Width="1000"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize" WindowStyle="ToolWindow"
         FontSize="14" FontFamily="Montserrat">

@@ -7,7 +7,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:Hotel.DatabaseControl.TabControl"
              mc:Ignorable="d" Background="White"
-             d:DesignHeight="600" d:DesignWidth="800"
+             d:DesignHeight="600" d:DesignWidth="1000"
              Loaded="ClientsWindow_Loaded">
     <UserControl.Resources>
         <Style x:Key="DataGridStyle" TargetType="DataGrid">
@@ -37,24 +37,12 @@
         <DockPanel Grid.Row="0"
                 HorizontalAlignment="Stretch">
             <TextBox Name="SearchText"
-                 materialDesign:HintAssist.Hint="Поиск"
-                 Margin="8" FontSize="13"
-                 DockPanel.Dock="Left"
-                 Width="300"
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
-            <Button x:Name="AddUserButton"
-                ToolTip="Icon"
-                BorderThickness="0"
-                Background="Transparent"
-                Width="30" Height="30"
-                HorizontalAlignment="Right"
-                Margin="10" DockPanel.Dock="Right">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=Add}"/>
-                    </Style>
-                </Button.Style>
-            </Button>
+                     materialDesign:HintAssist.Hint="Поиск"
+                     FontSize="13" Margin="8 5"
+                     HorizontalAlignment="Left"
+                     Width="300"
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                     TextChanged="SearchText_TextChanged"/>
         </DockPanel>
 
         <materialDesign:Card Grid.Row="1"

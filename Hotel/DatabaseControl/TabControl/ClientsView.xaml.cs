@@ -44,10 +44,10 @@ namespace Hotel.DatabaseControl.TabControl
                 "from Clients " +
                 "left join ClientPassports on passport=passportID " +
                 "left join BirthCertificate on birthCertificate=birthCertificateID;");
-            clientsOriginal = clients.Copy();
 
             if (clients != null)
             {
+                clientsOriginal = clients.Copy();
                 Clients.ItemsSource = clients.DefaultView;
                 ConfigureDataGrid();
             }
@@ -57,34 +57,75 @@ namespace Hotel.DatabaseControl.TabControl
         {
             foreach (DataGridColumn column in Clients.Columns)
             {
-                if (column.Header.ToString() == "lastName")
+                switch (column.Header.ToString())
                 {
-                    column.Header = "Фамилия";
+                    case "lastName":
+                        column.Header = "Фамилия";
+                        break;
+                    case "firstName":
+                        column.Header = "Имя";
+                        break;
+                    case "middleName":
+                        column.Header = "Отчество";
+                        break;
+                    case "birthDate":
+                        column.Header = "Дата рождения";
+                        break;
+                    case "phoneNumber":
+                        column.Header = "Телефон";
+                        break;
+                    case "email":
+                        column.Header = "Эл. почта";
+                        break;
+                    default:
+                        column.Visibility = Visibility.Collapsed;
+                        break;
                 }
-                else if (column.Header.ToString() == "firstName")
+            }
+        }
+
+        private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string searchText = SearchText.Text.ToLower();
+
+            if (string.IsNullOrEmpty(searchText))
+            {
+                // Восстанавливаем исходную таблицу, если строка поиска пустая
+                Clients.ItemsSource = clientsOriginal.DefaultView;
+                ConfigureDataGrid();
+                return;
+            }
+
+            DataView dv = new DataView(clientsOriginal);
+            dv.RowFilter = $"lastName LIKE '%{searchText}%' OR firstName LIKE '%{searchText}%'";
+
+            DataTable newTable = clientsOriginal.Clone(); // Копируем структуру исходной таблицы
+
+            // Добавляем отфильтрованные строки в начало новой таблицы
+            foreach (DataRowView row in dv)
+            {
+                newTable.ImportRow(row.Row);
+            }
+
+            // Добавляем оставшиеся строки
+            foreach (DataRow row in clientsOriginal.Rows)
+            {
+                string name = row["lastName"].ToString().ToLower();
+                string login = row["firstName"].ToString().ToLower();
+
+                if (!name.Contains(searchText) && !login.Contains(searchText))
                 {
-                    column.Header = "Имя";
+                    newTable.ImportRow(row);
                 }
-                else if (column.Header.ToString() == "middleName")
-                {
-                    column.Header = "Отчество";
-                }
-                else if (column.Header.ToString() == "birthDate")
-                {
-                    column.Header = "Дата рождения";
-                }
-                else if (column.Header.ToString() == "phoneNumber")
-                {
-                    column.Header = "Телефон";
-                }
-                else if (column.Header.ToString() == "email")
-                {
-                    column.Header = "Эл. почта";
-                }
-                else
-                {
-                    column.Visibility = Visibility.Collapsed;
-                }
+            }
+
+            Clients.ItemsSource = newTable.DefaultView;
+            ConfigureDataGrid();
+
+            if (newTable.Rows.Count > 0)
+            {
+                Clients.SelectedIndex = 0;
+                Clients.ScrollIntoView(Clients.SelectedItem);
             }
         }
     }

@@ -152,6 +152,9 @@
     <Compile Include="DatabaseControl\DatabaseView.xaml.cs">
       <DependentUpon>DatabaseView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DatabaseControl\RoomEdit.xaml.cs">
+      <DependentUpon>RoomEdit.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DatabaseControl\TabControl\BookingsView.xaml.cs">
       <DependentUpon>BookingsView.xaml</DependentUpon>
     </Compile>
@@ -206,6 +209,10 @@
       <DependentUpon>DatabaseConnectionSetup.xaml</DependentUpon>
     </Compile>
     <Page Include="DatabaseControl\DatabaseView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DatabaseControl\RoomEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
