@@ -8,10 +8,11 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Пользователи" Height="450" Width="680"
-        WindowStartupLocation="Manual"
+        WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize" WindowStyle="ToolWindow"
         FontSize="14" FontFamily="Montserrat"
-        Loaded="UsersWindow_Loaded">
+        Loaded="UsersWindow_Loaded"
+        Closing="UsersWindow_Closing">
 
     <Window.Resources>
         <Style x:Key="DataGridStyle" TargetType="DataGrid">

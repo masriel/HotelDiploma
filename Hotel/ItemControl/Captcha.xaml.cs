@@ -127,8 +127,8 @@ namespace Hotel.ItemControl
             }
 
             MessageBox.Show("Ошибка ввода капчи!", "ПРОВЕРКА", MessageBoxButton.OK, MessageBoxImage.Error);
-            GenerateCaptcha();
             CaptchaText.Text = string.Empty;
+            GenerateCaptcha();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 
 using Hotel.DatabaseControl;
+using Hotel.AdminPanel;
 using Hotel.Classes;
 
 namespace Hotel.Pages
@@ -14,8 +15,8 @@ namespace Hotel.Pages
     {
         private Navigation NAVIGATION = new Navigation();
 
-        private string PASSWORD = String.Empty;
-        private string NAME = String.Empty;
+        private string PASSWORD, NAME;
+
         public AdminPanelView(string name, string pwd)
         {
             InitializeComponent();
@@ -35,17 +36,22 @@ namespace Hotel.Pages
 
         private void Users_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            NAVIGATION.OpenAsDialog(new UsersView());
+            NAVIGATION.OpenAsNewPage(new UsersView(NAME, PASSWORD), this);
         }
 
         private void Database_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            MessageBox.Show("нажатие на бд");
+            NAVIGATION.OpenAsNewPage(new DatabaseView(NAME, PASSWORD), this);
         }
 
         private void DatabaseControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            NAVIGATION.OpenAsNewPage(new AdminPanel.ControlDatabaseView(NAME, PASSWORD), this);
+            NAVIGATION.OpenAsNewPage(new ControlDatabaseView(NAME, PASSWORD), this);
+        }
+
+        private void HideButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
         }
 
         private void AdminPanelWindow_Loaded(object sender, RoutedEventArgs e)

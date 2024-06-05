@@ -9,6 +9,7 @@
              mc:Ignorable="d" Background="White"
              d:DesignHeight="600" d:DesignWidth="1000"
              Loaded="ClientsWindow_Loaded">
+    
     <UserControl.Resources>
         <Style x:Key="DataGridStyle" TargetType="DataGrid">
             <Setter Property="Background" Value="#F5F5F5" />
@@ -34,8 +35,8 @@
             <RowDefinition Height=".1*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0"
-                HorizontalAlignment="Stretch">
+        
+        <DockPanel Grid.Row="0" HorizontalAlignment="Stretch">
             <TextBox Name="SearchText"
                      materialDesign:HintAssist.Hint="Поиск"
                      FontSize="13" Margin="8 5"
@@ -45,18 +46,18 @@
                      TextChanged="SearchText_TextChanged"/>
         </DockPanel>
 
-        <materialDesign:Card Grid.Row="1"
-                         Margin="10">
+        <materialDesign:Card Grid.Row="1" Margin="10">
             <Grid>
-                <DataGrid x:Name="Clients"
-                      Style="{StaticResource DataGridStyle}">
+                <DataGrid x:Name="Clients" Style="{StaticResource DataGridStyle}">
                     <DataGrid.ContextMenu>
                         <ContextMenu Background="#F5F5F5"
                                  Style="{StaticResource MaterialDesignMenu}">
                             <MenuItem Header="УДАЛИТЬ"
-                                  Name="DeleteUser"/>
+                                      Name="DeleteClientButton"
+                                      Click="DeleteClient_Click"/>
                             <MenuItem Header="РЕДАКТИРОВАТЬ"
-                                  Name="EditUser"/>
+                                      Name="EditClient"
+                                      Click="EditClient_Click"/>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                 </DataGrid>

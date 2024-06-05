@@ -1,22 +1,9 @@
-﻿using Hotel.Classes;
-using MySqlX.XDevAPI;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
 using MySql.Data.MySqlClient;
+using Hotel.Classes;
 
 namespace Hotel.DatabaseControl.TabControl
 {
@@ -25,41 +12,46 @@ namespace Hotel.DatabaseControl.TabControl
     /// </summary>
     public partial class BookingsView : UserControl
     {
-        private string CONNECTION_STRING = String.Empty;
+        private readonly string _connectionString;
+        private readonly ConnectionInfo _db;
+        private readonly Navigation _navigation = new Navigation();
 
-        private MySqlConnection CONNECTION;
-        private MySqlCommand COMMAND;
-
-        private ConnectionInfo db;
-        private ReadConfigFile _config = new ReadConfigFile();
-        Navigation NAVIGATION = new Navigation();
-
-        private DataTable bookings = new DataTable();
-        private DataTable bookingsOriginal;
+        private DataTable _bookings;
+        private DataTable _bookingsOriginal;
 
         public BookingsView()
         {
             InitializeComponent();
+            var config = new ReadConfigFile();
+            _connectionString = config.GetConnectionString();
+            _db = new ConnectionInfo(_connectionString);
+        }
 
-            CONNECTION_STRING = _config.GetConnectionString();
-            db = new ConnectionInfo(CONNECTION_STRING);
+        private void BookingsWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoadData();
         }
 
         private void LoadData()
         {
-            bookings = db.GetData("select bookingClientsID, BookingClients.booking, client, bookingNumber, DATE_FORMAT(arrivalDate, '%d.%m.%Y') as arrivalDate, DATE_FORMAT(departureDate, '%d.%m.%Y') as departureDate, room, meal, quantity, mealName, mealCost, roomNumber, roomType, firstName, lastName, middleName, birthDate, phoneNumber, email, passport, birthCertificate " +
-                "from BookingClients " +
-                "left join Bookings on BookingClients.booking = bookingID " +
-                "left join BookingMeals on BookingClients.booking = bookingID " +
-                "left join Meals on meal = mealID " +
-                "left join Rooms on room = roomID " +
-                "left join Clients on client = clientID " +
-                " order by bookingNumber;");
+            const string query = "SELECT bookingID, bookingClientsID, bookingNumber, " +
+                "client, lastName, firstName, phoneNumber, passport, birthCertificate, " +
+                "DATE_FORMAT(arrivalDate, '%d.%m.%Y') as arrivalDate, DATE_FORMAT(departureDate, '%d.%m.%Y') as departureDate, " +
+                "room, roomNumber, " +
+                "meal, mealName, quantity, mealCost, " +
+                "amount FROM BookingClients " +
+                "LEFT JOIN Bookings ON BookingClients.booking = bookingID " +
+                "LEFT JOIN BookingMeals ON BookingClients.booking = BookingMeals.booking " +
+                "LEFT JOIN Meals ON meal = mealID LEFT JOIN Rooms ON room = roomID " +
+                "LEFT JOIN Clients ON client = clientID " +
+                "ORDER BY bookingNumber;";
 
-            if (bookings != null)
+            _bookings = _db.GetData(query);
+
+            if (_bookings != null)
             {
-                bookingsOriginal = bookings.Copy();
-                Bookings.ItemsSource = bookings.DefaultView;
+                _bookingsOriginal = _bookings.Copy();
+                Bookings.ItemsSource = _bookings.DefaultView;
                 ConfigureDataGrid();
             }
         }
@@ -101,38 +93,35 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
-        private void BookingsWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            LoadData();
-        }
-
         private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string searchText = SearchText.Text.ToLower();
+            var searchText = SearchText.Text.ToLower();
 
             if (string.IsNullOrEmpty(searchText))
             {
-                // Восстанавливаем исходную таблицу, если строка поиска пустая
-                Bookings.ItemsSource = bookingsOriginal.DefaultView;
+                // Restore original table if search string is empty
+                Bookings.ItemsSource = _bookingsOriginal.DefaultView;
                 ConfigureDataGrid();
                 return;
             }
 
-            DataView dv = new DataView(bookingsOriginal);
-            dv.RowFilter = $"bookingNumber LIKE '%{searchText}%'";
+            var dv = new DataView(_bookingsOriginal)
+            {
+                RowFilter = $"bookingNumber LIKE '%{searchText}%'"
+            };
 
-            DataTable newTable = bookingsOriginal.Clone(); // Копируем структуру исходной таблицы
+            var newTable = _bookingsOriginal.Clone(); // Clone original table structure
 
-            // Добавляем отфильтрованные строки в начало новой таблицы
+            // Add filtered rows to the new table
             foreach (DataRowView row in dv)
             {
                 newTable.ImportRow(row.Row);
             }
 
-            // Добавляем оставшиеся строки
-            foreach (DataRow row in bookingsOriginal.Rows)
+            // Add remaining rows
+            foreach (DataRow row in _bookingsOriginal.Rows)
             {
-                string name = row["bookingNumber"].ToString().ToLower();
+                var name = row["bookingNumber"].ToString().ToLower();
 
                 if (!name.Contains(searchText))
                 {
@@ -147,6 +136,73 @@ namespace Hotel.DatabaseControl.TabControl
             {
                 Bookings.SelectedIndex = 0;
                 Bookings.ScrollIntoView(Bookings.SelectedItem);
+            }
+        }
+
+        private void DeleteBookingButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Bookings.SelectedItem is DataRowView selectedRow)
+            {
+                var bookingId = Convert.ToInt32(selectedRow["bookingID"]);
+                var bookingNumber = Convert.ToString(selectedRow["bookingNumber"]);
+
+                if (MessageBox.Show($"Вы уверены, что хотите удалить запись {bookingNumber}?", "УДАЛЕНИЕ", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    DeleteBooking(bookingId);
+                    LoadData();
+                }
+            }
+        }
+
+        private void DeleteBooking(int bookingId)
+        {
+            try
+            {
+                // Retrieve related booking clients and meals IDs before deleting the booking
+                var bookingData = _db.GetData($"SELECT bookingClientsID FROM BookingClients WHERE booking = {bookingId}");
+                var bookingMealsData = _db.GetData($"SELECT bookingMealID FROM BookingMeals WHERE booking = {bookingId}");
+
+                using (var connection = new MySqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    var transaction = connection.BeginTransaction();
+
+                    try
+                    {
+                        // Delete booking clients
+                        foreach (DataRow row in bookingData.Rows)
+                        {
+                            var bookingClientsId = Convert.ToInt32(row["bookingClientsID"]);
+                            _db.ExecuteCommand("DELETE FROM BookingClients WHERE bookingClientsID = @BookingClientsID", new MySqlParameter("@BookingClientsID", bookingClientsId));
+                        }
+
+                        // Delete booking meals
+                        foreach (DataRow row in bookingMealsData.Rows)
+                        {
+                            var bookingMealID = Convert.ToInt32(row["bookingMealID"]);
+                            _db.ExecuteCommand("DELETE FROM BookingMeals WHERE bookingMealID = @bookingMealID", new MySqlParameter("@bookingMealID", bookingMealID));
+                        }
+
+                        // Delete booking
+                        _db.ExecuteCommand("DELETE FROM Bookings WHERE bookingID = @BookingID", new MySqlParameter("@BookingID", bookingId));
+
+                        // Commit transaction
+                        transaction.Commit();
+
+                        MessageBox.Show("Запись удалена!", "УДАЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadData(); // Reload data after deletion
+                    }
+                    catch (Exception ex)
+                    {
+                        // Rollback transaction in case of an error
+                        transaction.Rollback();
+                        MessageBox.Show(ex.Message, "УДАЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "УДАЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

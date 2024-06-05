@@ -10,7 +10,8 @@
         Title="База данных" Height="600" Width="1000"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize" WindowStyle="ToolWindow"
-        FontSize="14" FontFamily="Montserrat">
+        FontSize="14" FontFamily="Montserrat"
+        Closing="DatabaseWindow_Closing">
     <Grid>
         <TabControl>
             <TabItem Header="Клиенты">

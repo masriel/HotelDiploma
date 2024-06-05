@@ -182,7 +182,7 @@ namespace Hotel.DatabaseControl
 
         private void AddUserWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            this.Owner.Show();
+            //this.Owner.Show();
         }
 
         private void AddUserWindow_Loaded(object sender, RoutedEventArgs e)
@@ -216,7 +216,7 @@ namespace Hotel.DatabaseControl
                     if (rowsAffected > 0)
                     {
                         MessageBox.Show("Данные пользователя успешно обновлены.", "РЕДАКТИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Information);
-                        NAVIGATION.OpenAsNewPage(new UsersView(), this);
+                        this.Close();
                         return;
                     }
                     MessageBox.Show("Произошла ошибка при редактировании пользователя.", "РЕДАКТИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);

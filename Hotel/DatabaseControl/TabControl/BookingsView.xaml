@@ -55,7 +55,8 @@
                         <ContextMenu Background="#F5F5F5"
                                      Style="{StaticResource MaterialDesignMenu}">
                             <MenuItem Header="УДАЛИТЬ"
-                                      Name="DeleteUser"/>
+                                      Name="DeleteBookingButton"
+                                      Click="DeleteBookingButton_Click"/>
                             <MenuItem Header="РЕДАКТИРОВАТЬ"
                                       Name="EditUser"/>
                         </ContextMenu>

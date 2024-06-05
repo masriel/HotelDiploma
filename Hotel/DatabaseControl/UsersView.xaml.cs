@@ -16,22 +16,27 @@ namespace Hotel.DatabaseControl
     public partial class UsersView : Window
     {
         private string CONNECTION_STRING = String.Empty;
-
         private MySqlConnection CONNECTION;
         private MySqlCommand COMMAND;
 
         private ConnectionInfo db;
         private ReadConfigFile _config = new ReadConfigFile();
-        Navigation NAVIGATION = new Navigation();
+
+        private Navigation NAVIGATION = new Navigation();
 
         private DataTable users = new DataTable();
         private DataTable usersOriginal;
 
-        public UsersView()
+        private string PASSWORD, NAME;
+
+        public UsersView(string name, string pwd)
         {
             InitializeComponent();
+
             CONNECTION_STRING = _config.GetConnectionString();
             db = new ConnectionInfo(CONNECTION_STRING);
+
+            NAME = name; PASSWORD = pwd;
         }
 
         private void UsersWindow_Loaded(object sender, RoutedEventArgs e)
@@ -122,11 +127,7 @@ namespace Hotel.DatabaseControl
 
         private void AddUserButton_Click(object sender, RoutedEventArgs e)
         {
-            UserRegistration registration = new UserRegistration(0, "", "", 0, false);
-            registration.Owner = this;
-
-            this.Hide();
-            NAVIGATION.OpenAsDialog(registration);
+            NAVIGATION.OpenAsDialog(new UserRegistration(0, "", "", 0, false));
         }
 
         private void DeleteUser_Click(object sender, RoutedEventArgs e)
@@ -180,6 +181,11 @@ namespace Hotel.DatabaseControl
             }
         }
 
+        private void UsersWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            new AdminPanelView(NAME, PASSWORD).Show();
+        }
+
         private void EditUser_Click(object sender, RoutedEventArgs e)
         {
             if (Users.SelectedItem != null)
@@ -192,7 +198,7 @@ namespace Hotel.DatabaseControl
 
                     if (userId != 0)
                     {
-                        NAVIGATION.OpenAsNewPage(new UserRegistration(userId, name, login, type, true), this);
+                        NAVIGATION.OpenAsDialog(new UserRegistration(userId, name, login, type, true));
                     }
                 }
             }

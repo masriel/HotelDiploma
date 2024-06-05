@@ -41,7 +41,7 @@ namespace Hotel.Pages
 
         private void HideButton_Click(object sender, RoutedEventArgs e)
         {
-
+            this.WindowState = WindowState.Minimized;
         }
 
         private void SmallScreenButton_Click(object sender, RoutedEventArgs e)

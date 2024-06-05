@@ -59,5 +59,29 @@ namespace Hotel.Classes
             }
             return dataTable;
         }
+
+        public void ExecuteCommand(string query, params MySqlParameter[] parameters)
+        {
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(CONNECTION_STRING))
+                {
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
 }

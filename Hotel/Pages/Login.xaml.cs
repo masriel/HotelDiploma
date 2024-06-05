@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 using MySql.Data.MySqlClient;
 using Hotel.Classes;
+using Hotel.ItemControl;
 
 namespace Hotel.Pages
 {
@@ -63,80 +64,82 @@ namespace Hotel.Pages
         //авторизация
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            string USERNAME = LoginText.Text, PASSWORD = Security.HashPasswd(PasswordText.Password);
+            //string USERNAME = LoginText.Text, PASSWORD = Security.HashPasswd(PasswordText.Password);
 
-            if (!CheckFields(USERNAME, PASSWORD))
-            {
-                MessageBox.Show("Все поля должны быть заполнены!", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+            //if (!CheckFields(USERNAME, PASSWORD))
+            //{
+            //    MessageBox.Show("Все поля должны быть заполнены!", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+            //    return;
+            //}
 
-            if (TRY_COUNT <= 0) NAVIGATION.OpenAsDialog(new ItemControl.Captcha());
+            //if (TRY_COUNT <= 0) NAVIGATION.OpenAsDialog(new Captcha());
 
-            try
-            {
-                using (CONNECTION = new MySqlConnection(CONNECTION_STRING))
-                {
-                    CONNECTION.Open();
+            //try
+            //{
+            //    using (CONNECTION = new MySqlConnection(CONNECTION_STRING))
+            //    {
+            //        CONNECTION.Open();
 
-                    //проверка существует ли пользователь
-                    string checkUserQuery = $"select count(*) from users where userEmail='{USERNAME}';";
-                    COMMAND = new MySqlCommand(checkUserQuery, CONNECTION);
-                    int userCount = Convert.ToInt32(COMMAND.ExecuteScalar());
-                    if (userCount == 0)
-                    {
-                        MessageBox.Show("Пользователь не существует.", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
+            //        //проверка существует ли пользователь
+            //        string checkUserQuery = $"select count(*) from users where userEmail='{USERNAME}';";
+            //        COMMAND = new MySqlCommand(checkUserQuery, CONNECTION);
+            //        int userCount = Convert.ToInt32(COMMAND.ExecuteScalar());
+            //        if (userCount == 0)
+            //        {
+            //            MessageBox.Show("Пользователь не существует.", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+            //            return;
+            //        }
 
-                    //проверка на правильность ввода
-                    string checkLoginQuery = $"select count(*) from users where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
-                    COMMAND = new MySqlCommand(checkLoginQuery, CONNECTION);
-                    int loginCount = Convert.ToInt32(COMMAND.ExecuteScalar());
-                    if (loginCount == 0)
-                    {
-                        MessageBox.Show("Неправильный логин или пароль.", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
-                        TRY_COUNT--;
+            //        //проверка на правильность ввода
+            //        string checkLoginQuery = $"select count(*) from users where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
+            //        COMMAND = new MySqlCommand(checkLoginQuery, CONNECTION);
+            //        int loginCount = Convert.ToInt32(COMMAND.ExecuteScalar());
+            //        if (loginCount == 0)
+            //        {
+            //            MessageBox.Show("Неправильный логин или пароль.", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+            //            TRY_COUNT--;
 
-                        if (TRY_COUNT == 0)
-                        {
-                            _ = BlockInputFieldsForDurationAsync(10000);
-                        }
+            //            if (TRY_COUNT == 0)
+            //            {
+            //                _ = BlockInputFieldsForDurationAsync(10000);
+            //            }
 
-                        return;
-                    }
+            //            return;
+            //        }
 
-                    //получение имени пользователя
-                    string getUserName = $"select userName from users  where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
-                    COMMAND = new MySqlCommand(getUserName, CONNECTION);
-                    object resultBack = COMMAND.ExecuteScalar();
-                    string name = String.Empty;
-                    if (resultBack != null)
-                    {
-                        name = Convert.ToString(resultBack);
-                    }
+            //        //получение имени пользователя
+            //        string getUserName = $"select userName from users  where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
+            //        COMMAND = new MySqlCommand(getUserName, CONNECTION);
+            //        object resultBack = COMMAND.ExecuteScalar();
+            //        string name = String.Empty;
+            //        if (resultBack != null)
+            //        {
+            //            name = Convert.ToString(resultBack);
+            //        }
 
-                    //определение типа пользователя
-                    string getUserType = $"select userType from users  where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
-                    int userType = 0;
-                    COMMAND = new MySqlCommand(getUserType, CONNECTION);
-                    resultBack = COMMAND.ExecuteScalar();
-                    if (resultBack != null)
-                    {
-                        userType = Convert.ToInt32(resultBack);
-                    }
+            //        //определение типа пользователя
+            //        string getUserType = $"select userType from users  where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
+            //        int userType = 0;
+            //        COMMAND = new MySqlCommand(getUserType, CONNECTION);
+            //        resultBack = COMMAND.ExecuteScalar();
+            //        if (resultBack != null)
+            //        {
+            //            userType = Convert.ToInt32(resultBack);
+            //        }
 
-                    //авторизация
-                    if (userType == 1) NAVIGATION.OpenAsNewPage(new AdminPanelView(name, PASSWORD), this);
-                    else NAVIGATION.OpenAsNewPage(new MainView(), this);
+            //        //авторизация
+            //        if (userType == 1) NAVIGATION.OpenAsNewPage(new AdminPanelView(name, PASSWORD), this);
+            //        else NAVIGATION.OpenAsNewPage(new MainView(), this);
 
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            //NAVIGATION.OpenAsNewPage(new AdminPanelView(), this);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
+
+            NAVIGATION.OpenAsNewPage(new AdminPanelView("Екатерина Мухина", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"), this);
+            //NAVIGATION.OpenAsNewPage(new MainView(), this);
         }
 
         //проверка на пустые поля

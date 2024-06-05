@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:Hotel.DatabaseControl"
         mc:Ignorable="d"
         Title="Информация о комнате" Height="370" Width="780"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="Manual"
         ResizeMode="NoResize" WindowStyle="ToolWindow"
         FontSize="21" FontFamily="Montserrat" 
         Foreground="#5C6BC0" FontWeight="Medium"
@@ -41,7 +41,7 @@
                          Style="{StaticResource MaterialDesignTextBox}"/>
 
                 <materialDesign:Card Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
-                                 Margin="20 32" Background="#E8EAF6">
+                                     Margin="20 32" Background="#E8EAF6">
                     <Grid Margin="10">
                         <StackPanel Orientation="Vertical"
                                     VerticalAlignment="Top" 

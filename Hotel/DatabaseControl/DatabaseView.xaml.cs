@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Hotel.Classes;
+using Hotel.Pages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +21,20 @@ namespace Hotel.DatabaseControl
     /// </summary>
     public partial class DatabaseView : Window
     {
-        public DatabaseView()
+        private Navigation NAVIGATION = new Navigation();
+
+        private string NAME, PASSWORD;
+
+        public DatabaseView(string name, string pwd)
         {
             InitializeComponent();
+
+            NAME = name; PASSWORD = pwd;
+        }
+
+        private void DatabaseWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            new AdminPanelView(NAME, PASSWORD).Show();
         }
     }
 }
