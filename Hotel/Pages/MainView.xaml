@@ -6,12 +6,11 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:Hotel.ItemControl"
         mc:Ignorable="d"
-        Title="Главная" Height="900" Width="1600"
-        MinHeight="550" MinWidth="800"
+        Title="Главная" Height="650" Width="1000"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="None"
+        WindowStyle="None" ResizeMode="NoResize"
         Background="#E8EAF6"
-        FontSize="18" FontFamily="Montserrat" Foreground="#5C6BC0"
+        FontSize="16" FontFamily="Montserrat" Foreground="#5C6BC0"
         Loaded="Window_Loaded"
         MouseLeftButtonDown="Window_MouseLeftButtonDown">
 
@@ -233,7 +232,7 @@
                   HorizontalAlignment="Stretch"
                   Margin="8"
                   Style="{StaticResource MaterialDesignFloatingHintComboBox}">
-            <ComboBoxItem Content="Площадь"/>
+            <ComboBoxItem Content="Статус"/>
             <ComboBoxItem Content="Кол-во жильцов"/>
             <ComboBoxItem Content="Цена"/>
         </ComboBox>
@@ -266,19 +265,134 @@
                     </Style>
                 </Button.Style>
             </Button>
+            <Button x:Name="ClearButton"
+                    ToolTip="Icon"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Width="40" Height="40"
+                    Click="ClearButton_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=FilterRemoveOutline}"/>
+                    </Style>
+                </Button.Style>
+            </Button>
         </StackPanel>
 
         <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
-            <ScrollViewer Style="{StaticResource MaterialDesignScrollViewer}"
-                          Margin="15">
-                <ItemsControl x:Name="Rooms">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <local:RoomInfoControl/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="50"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="1"
+                        Orientation="Vertical"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                <Button x:Name="UpButton"
+                        ToolTip="Icon"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Width="20" Height="20"
+                        Opacity=".65"
+                        Click="UpButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Content" Value="{materialDesign:PackIcon Kind=ArrowUpDropCircle}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <TextBlock>
+                    <Run Name="CurrentPage"/>
+                    <Run Text="/"/>
+                    <Run Name="TotalPages"/>
+                </TextBlock>
+                <Button x:Name="DownButton"
+                        ToolTip="Icon"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Width="20" Height="20"
+                        Opacity=".65"
+                        Click="DownButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Content" Value="{materialDesign:PackIcon Kind=ArrowDownDropCircle}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+            <ItemsControl Grid.Column="0" x:Name="Rooms" Margin="15 15 0 16">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <materialDesign:Card Margin="5">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height=".2*"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="320"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <materialDesign:Card Grid.Column="0" Grid.Row="1"
+                                                        Padding="5" Margin="10"
+                                                        Width="300" Height="300"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center">
+                                    <Image Source="{Binding Photo}"/>
+                                </materialDesign:Card>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                            Margin="15 3" Text="{Binding Type}"
+                                            FontWeight="ExtraBold" FontSize="46"
+                                            VerticalAlignment="Center"/>
+
+                                <TextBlock Grid.Row="0" Grid.Column="2"
+                                            Margin="10" VerticalAlignment="Top"
+                                            HorizontalAlignment="Right" FontWeight="Light"
+                                            Foreground="#3949AB">
+                                    <Run Text="Статус:"/>
+                                    <Run Text="{Binding IsFree}"/>
+                                </TextBlock>
+
+                                <materialDesign:Card Grid.Row="1" Grid.Column="1"
+                                                        Margin="10" Background="#E8EAF6">
+                                    <Grid Margin="5">
+                                        <StackPanel Orientation="Vertical"
+                                                    VerticalAlignment="Top">
+                                            <TextBlock FontSize="30" TextWrapping="Wrap">
+                                                <Run Text="{Binding Description}"/>
+                                            </TextBlock>
+                                            <TextBlock FontSize="34">
+                                                <Run Text="Кол-во мест:"
+                                                        FontWeight="ExtraBold"/>
+                                                <Run Text="{Binding Occupancy}"/>
+                                                <Run Text="чел."/>
+                                            </TextBlock>
+                                            <TextBlock FontSize="34">
+                                                <Run Text="Номер:"
+                                                        FontWeight="ExtraBold"/>
+                                                <Run Text="{Binding Number}"
+                                                        FontWeight="DemiBold"/>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <TextBlock FontSize="32" FontWeight="Light"
+                                                    VerticalAlignment="Bottom"
+                                                    HorizontalAlignment="Right"
+                                                    Foreground="#3949AB">
+                                            <Run Text="{Binding Cost}"/>
+                                            <Run Text="руб/ночь"/>
+                                        </TextBlock>
+                                    </Grid>
+                                </materialDesign:Card>
+                            </Grid>
+                        </materialDesign:Card>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </Grid>
     </Grid>
 </Window>
+
+    
