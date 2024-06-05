@@ -5,19 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             d:DesignHeight="350" d:DesignWidth="800"
+             d:DesignHeight="700" d:DesignWidth="1860"
              Background="Transparent"
              FontSize="18" FontFamily="Montserrat" 
              Foreground="#5C6BC0" FontWeight="Medium">
     <Grid>
 
         <materialDesign:Card Margin="10">
-            <Grid ShowGridLines="True">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height=".3*"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
@@ -27,7 +27,8 @@
                 <Image Grid.Column="0"
                        Margin="5"
                        VerticalAlignment="Center"
-                       HorizontalAlignment="Center"/>
+                       HorizontalAlignment="Center"
+                       Source="{Binding Photo}"/>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                            Margin="15 3" Text="{Binding Type}"
@@ -38,8 +39,8 @@
                            Margin="10" VerticalAlignment="Top"
                            HorizontalAlignment="Right" FontWeight="Light"
                            Foreground="#3949AB">
-                    <Run Text="Свободных: "/>
-                    <Run Text="10"/>
+                    <Run Text="Статус:"/>
+                    <Run Text="{Binding IsFree}"/>
                 </TextBlock>
 
                 <materialDesign:Card Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
@@ -48,17 +49,17 @@
                         <StackPanel Orientation="Vertical"
                                     VerticalAlignment="Top">
                             <TextBlock FontSize="24" TextWrapping="Wrap">
-                            <Run Text="{Binding Description}"/>
+                                <Run Text="{Binding Description}"/>
                             </TextBlock>
                             <TextBlock FontSize="24">
-                            <Run Text="Кол-во мест: "/>
-                            <Run Text="{Binding Occupancy}"/>
-                            <Run Text="чел."/>
+                                <Run Text="Кол-во мест: "/>
+                                <Run Text="{Binding Occupancy}"/>
+                                <Run Text="чел."/>
                             </TextBlock>
                             <TextBlock FontSize="24">
-                            <Run Text="Площадь: "/>
-                            <Run Text="4"/>
-                            <Run Text="кв.м."/>
+                                <Run Text="Площадь: "/>
+                                <Run Text="4"/>
+                                <Run Text="кв.м."/>
                             </TextBlock>
                         </StackPanel>
                         <TextBlock FontSize="22" FontWeight="Light"
