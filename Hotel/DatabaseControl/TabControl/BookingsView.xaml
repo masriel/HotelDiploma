@@ -58,7 +58,8 @@
                                       Name="DeleteBookingButton"
                                       Click="DeleteBookingButton_Click"/>
                             <MenuItem Header="РЕДАКТИРОВАТЬ"
-                                      Name="EditUser"/>
+                                      Name="EditBookingButton"
+                                      Click="EditBookingButton_Click"/>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                 </DataGrid>

@@ -149,6 +149,10 @@
     <Compile Include="Classes\ConfigData.cs" />
     <Compile Include="Classes\ReadConfigFile.cs" />
     <Compile Include="Classes\Rooms.cs" />
+    <Compile Include="Classes\RoomStatusUpdater.cs" />
+    <Compile Include="DatabaseControl\BookingEdit.xaml.cs">
+      <DependentUpon>BookingEdit.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DatabaseControl\ClientEdit.xaml.cs">
       <DependentUpon>ClientEdit.xaml</DependentUpon>
     </Compile>
@@ -211,6 +215,10 @@
     <Compile Include="DatabaseConnectionSetup.xaml.cs">
       <DependentUpon>DatabaseConnectionSetup.xaml</DependentUpon>
     </Compile>
+    <Page Include="DatabaseControl\BookingEdit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DatabaseControl\ClientEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

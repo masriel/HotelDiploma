@@ -9,7 +9,7 @@
         Title="Главная" Height="650" Width="1000"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None" ResizeMode="NoResize"
-        Background="#E8EAF6"
+        WindowState="Maximized" Background="#E8EAF6"
         FontSize="16" FontFamily="Montserrat" Foreground="#5C6BC0"
         Loaded="Window_Loaded"
         MouseLeftButtonDown="Window_MouseLeftButtonDown">
@@ -89,7 +89,7 @@
                     Height="30" Width="30"
                     BorderThickness="0"
                     Background="Transparent"
-                    Visibility="Visible"
+                    Visibility="Collapsed"
                     Click="FullScreenButton_Click">
                 <Button.Style>
                     <Style TargetType="Button">
@@ -102,7 +102,7 @@
                     Height="30" Width="30"
                     BorderThickness="0"
                     Background="Transparent"
-                    Visibility="Collapsed"
+                    Visibility="Visible"
                     Click="SmallScreenButton_Click">
                 <Button.Style>
                     <Style TargetType="Button">
@@ -219,27 +219,28 @@
         </materialDesign:Card>
 
         <TextBox Grid.Row="2" Grid.Column="0"
-                    x:Name="SearchText"
-                    materialDesign:HintAssist.Hint="Название номера"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Stretch"
-                    Margin="8"
-                    Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                x:Name="SearchText"
+                materialDesign:HintAssist.Hint="Название номера"
+                VerticalAlignment="Center"
+                Margin="8"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+  
         <ComboBox Grid.Row="2" Grid.Column="1"
                   x:Name="FilterBox"
                   materialDesign:HintAssist.Hint="Фильтровать по"
                   VerticalAlignment="Center"
-                  HorizontalAlignment="Stretch"
+                  HorizontalAlignment="Left"
                   Margin="8"
                   Style="{StaticResource MaterialDesignFloatingHintComboBox}">
             <ComboBoxItem Content="Статус"/>
             <ComboBoxItem Content="Кол-во жильцов"/>
             <ComboBoxItem Content="Цена"/>
         </ComboBox>
-        <StackPanel Grid.Row="2" Grid.Column="2"
+        
+        <StackPanel Grid.Row="2" Grid.Column="1"
                     Orientation="Horizontal"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Left"
+                    HorizontalAlignment="Right"
                     Margin="8">
             <Button x:Name="DescButton"
                     ToolTip="Icon"
@@ -278,6 +279,13 @@
                 </Button.Style>
             </Button>
         </StackPanel>
+
+        <Button Grid.Row="2" Grid.Column="2"
+                x:Name="UpdateStatusButton"
+                Content="ПРОВЕРИТЬ"
+                Background="#5C6BC0"
+                Margin="48 0"
+                Click="UpdateStatusButton_Click"/>
 
         <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
             <Grid.ColumnDefinitions>
@@ -320,7 +328,8 @@
                     </Button.Style>
                 </Button>
             </StackPanel>
-            <ItemsControl Grid.Column="0" x:Name="Rooms" Margin="15 15 0 16">
+            <ItemsControl Grid.Column="0" x:Name="Rooms"
+                          VerticalAlignment="Center">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <materialDesign:Card Margin="5">

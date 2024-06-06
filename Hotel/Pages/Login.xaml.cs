@@ -138,8 +138,8 @@ namespace Hotel.Pages
             //    MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             //}
 
-            //NAVIGATION.OpenAsNewPage(new AdminPanelView("Екатерина Мухина", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"), this);
-            NAVIGATION.OpenAsNewPage(new MainView("Екатерина Мухина"), this);
+            NAVIGATION.OpenAsNewPage(new AdminPanelView("Екатерина Мухина", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"), this);
+            //NAVIGATION.OpenAsNewPage(new MainView("Екатерина Мухина"), this);
         }
 
         //проверка на пустые поля

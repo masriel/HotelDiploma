@@ -16,11 +16,12 @@ namespace Hotel.Pages
         private readonly Navigation _navigation = new Navigation();
         private readonly string _name;
         private readonly ConnectionInfo _db;
+        private readonly RoomStatusUpdater _roomStatusUpdater = new RoomStatusUpdater();
         private readonly ReadConfigFile _config = new ReadConfigFile();
         private ObservableCollection<Rooms> _allRooms;
         private ObservableCollection<Rooms> _displayedRooms;
         private int currentPage = 1;
-        private int itemsPerPage = 1;
+        private int itemsPerPage = 2;
         private int totalItems;
         private int totalPages;
 
@@ -227,6 +228,20 @@ namespace Hotel.Pages
         {
             SearchText.Clear();
             FilterBox.SelectedIndex = -1;
+            LoadRooms();
+        }
+
+        private void UpdateStatusButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _roomStatusUpdater.UpdateRoomStatus();
+                MessageBox.Show("Информация о доступность номеров актуальная!", "АКТУАЛИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
             LoadRooms();
         }
     }

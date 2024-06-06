@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using MySql.Data.MySqlClient;
 using Hotel.Classes;
+using System.Security.Cryptography;
 
 namespace Hotel.DatabaseControl.TabControl
 {
@@ -82,9 +83,6 @@ namespace Hotel.DatabaseControl.TabControl
                         break;
                     case "roomNumber":
                         column.Header = "Комната";
-                        break;
-                    case "mealName":
-                        column.Header = "Питание";
                         break;
                     default:
                         column.Visibility = Visibility.Collapsed;
@@ -203,6 +201,19 @@ namespace Hotel.DatabaseControl.TabControl
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "УДАЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void EditBookingButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Bookings.SelectedItem is DataRowView selectedRow)
+            {
+                var bookingId = Convert.ToInt32(selectedRow["bookingID"]);
+
+                if (new BookingEdit(bookingId).ShowDialog() == true)
+                {
+                    LoadData();
+                }
             }
         }
     }
