@@ -61,6 +61,16 @@ namespace Hotel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] ClientProfile {
+            get {
+                object obj = ResourceManager.GetObject("ClientProfile", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon hotel_app_icon {
@@ -167,6 +177,16 @@ namespace Hotel.Properties {
             get {
                 object obj = ResourceManager.GetObject("IMG_10", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] PaymentReceipt {
+            get {
+                object obj = ResourceManager.GetObject("PaymentReceipt", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

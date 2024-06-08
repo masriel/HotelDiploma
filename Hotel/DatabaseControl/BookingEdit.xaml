@@ -56,7 +56,6 @@
                        FontWeight="ExtraBold" FontSize="20"
                        VerticalAlignment="Center"/>
             <ComboBox x:Name="RoomsFree"
-                      SelectedIndex="0"
                       FontSize="18"/>
         </StackPanel>
 

@@ -29,9 +29,11 @@
             <ComboBoxItem Content="Ужин"/>
         </ComboBox>
 
-        <ComboBox Grid.Column="1" Grid.Row="0"
-                  x:Name="MealQuantity"
-                  Margin="5"/>
+        <TextBox Grid.Column="1" Grid.Row="0"
+                 x:Name="MealQuantity"
+                 VerticalAlignment="Center"
+                 Margin="5"
+                 PreviewTextInput="MealQuantity_PreviewTextInput"/>
 
         <Button Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
                 x:Name="AddButton"

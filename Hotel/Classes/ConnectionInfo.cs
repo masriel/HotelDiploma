@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Windows;
-
 using MySql.Data.MySqlClient;
 
 namespace Hotel.Classes
@@ -86,6 +85,33 @@ namespace Hotel.Classes
             {
                 MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        // Метод для выполнения команды и получения ID вставленной записи
+        public int ExecuteInsertAndGetId(string query, params MySqlParameter[] parameters)
+        {
+            int id = 0;
+            try
+            {
+                using (var connection = new MySqlConnection(CONNECTION_STRING))
+                {
+                    using (var command = new MySqlCommand(query, connection))
+                    {
+                        if (parameters != null && parameters.Length > 0)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+
+                        connection.Open();
+                        id = Convert.ToInt32(command.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            return id;
         }
     }
 }

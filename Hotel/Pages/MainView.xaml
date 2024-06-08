@@ -11,8 +11,7 @@
         WindowStyle="None" ResizeMode="NoResize"
         WindowState="Maximized" Background="#E8EAF6"
         FontSize="16" FontFamily="Montserrat" Foreground="#5C6BC0"
-        Loaded="Window_Loaded"
-        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+        Loaded="Window_Loaded">
 
     <Window.Resources>
         <Style TargetType="materialDesign:Card" x:Key="Card">
@@ -134,7 +133,8 @@
 
         <materialDesign:Card Grid.Row="1" Grid.Column="0"
                              Name="Clients"
-                             Style="{StaticResource Card}">
+                             Style="{StaticResource Card}"
+                             PreviewMouseUp="Clients_PreviewMouseUp">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width=".5*"/>
@@ -162,7 +162,7 @@
         </materialDesign:Card>
 
         <materialDesign:Card Grid.Row="1" Grid.Column="1"
-                             Name="Bookings"
+                             Name="d"
                              Style="{StaticResource Card}">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -191,8 +191,9 @@
         </materialDesign:Card>
 
         <materialDesign:Card Grid.Row="1" Grid.Column="2"
-                             Name="CheckIn"
-                             Style="{StaticResource Card}">
+                             Name="Bookings"
+                             Style="{StaticResource Card}"
+                             PreviewMouseUp="Bookings_PreviewMouseUp">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width=".4*"/>
@@ -213,122 +214,125 @@
                     </Grid>
                 </Border>
                 <TextBlock Grid.Column="1"
-                           Text="БРОНИРОВАНИЕ"
+                           Text="ОФОРМЛЕНИЕ"
                            Style="{StaticResource TitleText}"/>
             </Grid>
         </materialDesign:Card>
 
         <TextBox Grid.Row="2" Grid.Column="0"
-                x:Name="SearchText"
-                materialDesign:HintAssist.Hint="Название номера"
-                VerticalAlignment="Center"
-                Margin="8"
-                Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
-  
+                 x:Name="SearchText"
+                 materialDesign:HintAssist.Hint="Название номера"
+                 VerticalAlignment="Center"
+                 Margin="8"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+
         <ComboBox Grid.Row="2" Grid.Column="1"
                   x:Name="FilterBox"
                   materialDesign:HintAssist.Hint="Фильтровать по"
-                  VerticalAlignment="Center"
-                  HorizontalAlignment="Left"
                   Margin="8"
                   Style="{StaticResource MaterialDesignFloatingHintComboBox}">
             <ComboBoxItem Content="Статус"/>
             <ComboBoxItem Content="Кол-во жильцов"/>
             <ComboBoxItem Content="Цена"/>
         </ComboBox>
-        
-        <StackPanel Grid.Row="2" Grid.Column="1"
-                    Orientation="Horizontal"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"
-                    Margin="8">
-            <Button x:Name="DescButton"
-                    ToolTip="Icon"
-                    BorderThickness="0"
-                    Background="Transparent"
-                    Width="40" Height="40"
-                    Click="DescButton_Click">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=SortDescending}"/>
-                    </Style>
-                </Button.Style>
-            </Button>
-            <Button x:Name="AscButton"
-                    ToolTip="Icon"
-                    BorderThickness="0"
-                    Background="Transparent"
-                    Width="40" Height="40"
-                    Click="AscButton_Click">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=SortAscending}"/>
-                    </Style>
-                </Button.Style>
-            </Button>
-            <Button x:Name="ClearButton"
-                    ToolTip="Icon"
-                    BorderThickness="0"
-                    Background="Transparent"
-                    Width="40" Height="40"
-                    Click="ClearButton_Click">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=FilterRemoveOutline}"/>
-                    </Style>
-                </Button.Style>
-            </Button>
-        </StackPanel>
 
-        <Button Grid.Row="2" Grid.Column="2"
-                x:Name="UpdateStatusButton"
-                Content="ПРОВЕРИТЬ"
-                Background="#5C6BC0"
-                Margin="48 0"
-                Click="UpdateStatusButton_Click"/>
-
-        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="50"/>
-            </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="1"
-                        Orientation="Vertical"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center">
-                <Button x:Name="UpButton"
+        <Grid Grid.Row="2" Grid.Column="2">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        Margin="8">
+                <Button x:Name="DescButton"
                         ToolTip="Icon"
                         BorderThickness="0"
                         Background="Transparent"
-                        Width="20" Height="20"
-                        Opacity=".65"
-                        Click="UpButton_Click">
+                        Width="40" Height="40"
+                        Click="DescButton_Click">
                     <Button.Style>
                         <Style TargetType="Button">
-                            <Setter Property="Content" Value="{materialDesign:PackIcon Kind=ArrowUpDropCircle}"/>
+                            <Setter Property="Content" Value="{materialDesign:PackIcon Kind=SortDescending}"/>
                         </Style>
                     </Button.Style>
                 </Button>
-                <TextBlock>
+                <Button x:Name="AscButton"
+                        ToolTip="Icon"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Width="40" Height="40"
+                        Click="AscButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Content" Value="{materialDesign:PackIcon Kind=SortAscending}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button x:Name="ClearButton"
+                        ToolTip="Icon"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Width="40" Height="40"
+                        Click="ClearButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Content" Value="{materialDesign:PackIcon Kind=FilterRemoveOutline}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+
+            <Button x:Name="UpdateStatusButton"
+                    ToolTip="Icon"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Width="40" Height="40"
+                    Margin="20 10"
+                    HorizontalAlignment="Right"
+                    Click="UpdateStatusButton_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=RefreshCircle}"/>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+      
+        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            
+            <StackPanel Grid.Row="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Center">
+                <Button x:Name="UpButton"
+                        BorderThickness="0"
+                        Width="30" Height="30"
+                        Click="UpButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Content" Value="{materialDesign:PackIcon Kind=MenuLeft}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <TextBlock Margin="10">
                     <Run Name="CurrentPage"/>
                     <Run Text="/"/>
                     <Run Name="TotalPages"/>
                 </TextBlock>
                 <Button x:Name="DownButton"
-                        ToolTip="Icon"
                         BorderThickness="0"
-                        Background="Transparent"
-                        Width="20" Height="20"
-                        Opacity=".65"
+                        Width="30" Height="30"
                         Click="DownButton_Click">
                     <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Content" Value="{materialDesign:PackIcon Kind=ArrowDownDropCircle}"/>
-                        </Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Content" Value="{materialDesign:PackIcon Kind=MenuRight}"/>
+                    </Style>
                     </Button.Style>
                 </Button>
+
             </StackPanel>
-            <ItemsControl Grid.Column="0" x:Name="Rooms"
+            <ItemsControl Grid.Row="0" x:Name="Rooms"
                           VerticalAlignment="Center">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

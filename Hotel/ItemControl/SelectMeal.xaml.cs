@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Windows;
+using Hotel.Classes; // Предполагается, что класс Meals находится в этом пространстве имен
 
 namespace Hotel.ItemControl
 {
@@ -14,37 +16,45 @@ namespace Hotel.ItemControl
         public string Name { get; private set; }
         public double Cost { get; private set; }
 
-        private readonly Dictionary<int, double> mealCosts = new Dictionary<int, double>
-        {
-            { 1, 700 },
-            { 2, 950 },
-            { 3, 800 }
-        };
-
-        public SelectMeal(int days)
+        public SelectMeal()
         {
             InitializeComponent();
-
-            for (int i = 1; i <= days; i++)
-            {
-                MealQuantity.Items.Add(i);
-            }
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            if (MealName.SelectedIndex == -1 || MealQuantity.SelectedItem == null)
+            if (MealName.SelectedIndex == -1 || string.IsNullOrEmpty(MealQuantity.Text))
             {
                 MessageBox.Show("Выберите необходимые данные.", "ВЫБОР", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            ID = MealName.SelectedIndex + 1;
-            Name = MealName.Text;
-            Quantity = Convert.ToInt32(MealQuantity.SelectedItem);
-            Cost = mealCosts.ContainsKey(ID) ? mealCosts[ID] : 0;
+            try
+            {
+                Meals meal = new Meals
+                {
+                    ID = MealName.SelectedIndex + 1,
+                    Name = MealName.Text,
+                    Quantity = Convert.ToInt32(MealQuantity.Text)
+                };
 
-            DialogResult = true;
+                ID = meal.ID;
+                Name = meal.Name;
+                Quantity = meal.Quantity;
+                Cost = meal.Cost * Quantity;
+
+                DialogResult = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void MealQuantity_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("^[0-9]+$");
+            e.Handled = !regex.IsMatch(e.Text);
         }
     }
 }

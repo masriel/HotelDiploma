@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+
 using Hotel.Classes;
 
 namespace Hotel.Pages
@@ -20,10 +21,10 @@ namespace Hotel.Pages
         private readonly ReadConfigFile _config = new ReadConfigFile();
         private ObservableCollection<Rooms> _allRooms;
         private ObservableCollection<Rooms> _displayedRooms;
-        private int currentPage = 1;
-        private int itemsPerPage = 2;
-        private int totalItems;
-        private int totalPages;
+        private int _currentPage = 1;
+        private int _itemsPerPage = 2;
+        private int _totalItems;
+        private int _totalPages;
 
         public MainView(string name)
         {
@@ -36,157 +37,135 @@ namespace Hotel.Pages
         {
             WorkerName.Text = _name;
             LoadRooms();
-            SearchText.TextChanged += SearchText_TextChanged;
-            FilterBox.SelectionChanged += FilterBox_SelectionChanged;
+            SearchText.TextChanged += (s, args) => FilterAndSortRooms();
+            FilterBox.SelectionChanged += (s, args) => FilterAndSortRooms();
         }
 
         private void LoadRooms()
         {
-            _allRooms = new ObservableCollection<Rooms>();
-            _displayedRooms = new ObservableCollection<Rooms>();
-
-            DataTable roomData = _db.GetData("SELECT roomID, roomNumber, RoomTypes.roomType as typeID, RoomTypes.roomType, maxOccupancy, roomDescription, roomPhoto, roomCost, isFree " +
-                                             "FROM Rooms LEFT JOIN RoomTypes ON Rooms.roomType = RoomTypes.roomTypeID");
-
-            foreach (DataRow row in roomData.Rows)
-            {
-                _allRooms.Add(new Rooms
-                {
-                    ID = Convert.ToInt32(row["roomID"]),
-                    Type = row["roomType"].ToString(),
-                    Number = Convert.ToString(row["roomNumber"]),
-                    Occupancy = row["maxOccupancy"].ToString(),
-                    Description = row["roomDescription"].ToString(),
-                    Photo = Path.Combine("pack://application:,,,/Resources", row["roomPhoto"].ToString()),
-                    Cost = row["roomCost"].ToString(),
-                    IsFree = row["isFree"].ToString() == "t" ? "Свободен" : "Занят"
-                });
-            }
-
-            totalItems = _allRooms.Count;
+            _allRooms = new ObservableCollection<Rooms>(GetRoomsFromDatabase());
+            _displayedRooms = new ObservableCollection<Rooms>(_allRooms);
+            _totalItems = _allRooms.Count;
             ApplyPagination();
+        }
+
+        private IEnumerable<Rooms> GetRoomsFromDatabase()
+        {
+            var roomData = _db.GetData("SELECT roomID, roomNumber, RoomTypes.roomType as typeID, RoomTypes.roomType, maxOccupancy, roomDescription, roomPhoto, roomCost, isFree " +
+                                       "FROM Rooms LEFT JOIN RoomTypes ON Rooms.roomType = RoomTypes.roomTypeID");
+
+            return from DataRow row in roomData.Rows
+                   select new Rooms
+                   {
+                       ID = Convert.ToInt32(row["roomID"]),
+                       Type = row["roomType"].ToString(),
+                       Number = row["roomNumber"].ToString(),
+                       Occupancy = row["maxOccupancy"].ToString(),
+                       Description = row["roomDescription"].ToString(),
+                       Photo = Path.Combine("pack://application:,,,/Resources", row["roomPhoto"].ToString()),
+                       Cost = row["roomCost"].ToString(),
+                       IsFree = row["isFree"].ToString() == "t" ? "Свободен" : "Занят"
+                   };
         }
 
         private void ApplyPagination()
         {
-            totalPages = (int)Math.Ceiling((double)totalItems / itemsPerPage);
-
-            _displayedRooms.Clear();
-            var paginatedRooms = _allRooms.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage).ToList();
-
-            foreach (var room in paginatedRooms)
-            {
-                _displayedRooms.Add(room);
-            }
-
-            Rooms.ItemsSource = _displayedRooms;
-
-            CurrentPage.Text = currentPage.ToString();
-            TotalPages.Text = totalPages.ToString();
-        }
-
-        private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            FilterAndSortRooms();
-        }
-
-        private void FilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            FilterAndSortRooms();
-        }
-
-        private void DescButton_Click(object sender, RoutedEventArgs e)
-        {
-            SortRooms(false);
-            ApplyPagination();
-        }
-
-        private void AscButton_Click(object sender, RoutedEventArgs e)
-        {
-            SortRooms(true);
-            ApplyPagination();
+            _totalPages = (int)Math.Ceiling((double)_totalItems / _itemsPerPage);
+            var paginatedRooms = _displayedRooms.Skip((_currentPage - 1) * _itemsPerPage).Take(_itemsPerPage).ToList();
+            Rooms.ItemsSource = new ObservableCollection<Rooms>(paginatedRooms);
+            CurrentPage.Text = _currentPage.ToString();
+            TotalPages.Text = _totalPages.ToString();
         }
 
         private void FilterAndSortRooms()
         {
             string searchText = SearchText.Text.ToLower();
             string filterType = (FilterBox.SelectedItem as ComboBoxItem)?.Content?.ToString();
+            var filteredRooms = _allRooms.AsEnumerable();
 
-            IEnumerable<Rooms> filteredRooms = _allRooms;
-
+            // Применить фильтрацию по типу номера только если searchText не пустой
             if (!string.IsNullOrEmpty(searchText))
             {
                 filteredRooms = filteredRooms.Where(r => r.Type.ToLower().Contains(searchText));
             }
 
-            switch (filterType)
+            // Применить сортировку в зависимости от выбранного типа фильтрации
+            if (filterType != null)
             {
-                case "Статус":
-                    filteredRooms = filteredRooms.OrderBy(r => r.IsFree);
-                    break;
-                case "Кол-во жильцов":
-                    filteredRooms = filteredRooms.OrderBy(r => Convert.ToInt32(r.Occupancy));
-                    break;
-                case "Цена":
-                    filteredRooms = filteredRooms.OrderBy(r => Convert.ToDouble(r.Cost));
-                    break;
+                filteredRooms = filterType switch
+                {
+                    "Статус" => filteredRooms.OrderBy(r => r.IsFree),
+                    "Кол-во жильцов" => filteredRooms.OrderBy(r => Convert.ToInt32(r.Occupancy)),
+                    "Цена" => filteredRooms.OrderBy(r => Convert.ToDouble(r.Cost)),
+                    _ => filteredRooms
+                };
             }
 
-            _allRooms = new ObservableCollection<Rooms>(filteredRooms);
-            totalItems = _allRooms.Count;
-            currentPage = 1;
+            _displayedRooms = new ObservableCollection<Rooms>(filteredRooms);
+            _totalItems = _displayedRooms.Count;
+            _currentPage = 1;
             ApplyPagination();
         }
 
         private void SortRooms(bool ascending)
         {
             string filterType = (FilterBox.SelectedItem as ComboBoxItem)?.Content?.ToString();
-            IEnumerable<Rooms> sortedRooms = _allRooms;
+            var sortedRooms = _displayedRooms.AsEnumerable();
 
-            switch (filterType)
+            if (filterType != null)
             {
-                case "Статус":
-                    sortedRooms = ascending ? sortedRooms.OrderBy(r => r.IsFree) : sortedRooms.OrderByDescending(r => r.IsFree);
-                    break;
-                case "Кол-во жильцов":
-                    sortedRooms = ascending ? sortedRooms.OrderBy(r => Convert.ToInt32(r.Occupancy)) : sortedRooms.OrderByDescending(r => Convert.ToInt32(r.Occupancy));
-                    break;
-                case "Цена":
-                    sortedRooms = ascending ? sortedRooms.OrderBy(r => Convert.ToDouble(r.Cost)) : sortedRooms.OrderByDescending(r => Convert.ToDouble(r.Cost));
-                    break;
+                sortedRooms = filterType switch
+                {
+                    "Статус" => ascending ? sortedRooms.OrderBy(r => r.IsFree) : sortedRooms.OrderByDescending(r => r.IsFree),
+                    "Кол-во жильцов" => ascending ? sortedRooms.OrderBy(r => Convert.ToInt32(r.Occupancy)) : sortedRooms.OrderByDescending(r => Convert.ToInt32(r.Occupancy)),
+                    "Цена" => ascending ? sortedRooms.OrderBy(r => Convert.ToDouble(r.Cost)) : sortedRooms.OrderByDescending(r => Convert.ToDouble(r.Cost)),
+                    _ => sortedRooms
+                };
             }
 
-            _allRooms = new ObservableCollection<Rooms>(sortedRooms);
+            _displayedRooms = new ObservableCollection<Rooms>(sortedRooms);
+            ApplyPagination();
+        }
+
+        private void DescButton_Click(object sender, RoutedEventArgs e)
+        {
+            SortRooms(false);
+        }
+
+        private void AscButton_Click(object sender, RoutedEventArgs e)
+        {
+            SortRooms(true);
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Закрыть приложение?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                this.Close();
+                Close();
             }
         }
 
         private void FullScreenButton_Click(object sender, RoutedEventArgs e)
         {
-            FullScreenButton.Visibility = Visibility.Collapsed;
-            SmallScreenButton.Visibility = Visibility.Visible;
-            this.WindowState = WindowState.Maximized;
-            itemsPerPage = 2;
-            ApplyPagination();
-        }
-
-        private void HideButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.WindowState = WindowState.Minimized;
+            SetWindowState(WindowState.Maximized, 2, FullScreenButton, SmallScreenButton);
         }
 
         private void SmallScreenButton_Click(object sender, RoutedEventArgs e)
         {
-            FullScreenButton.Visibility = Visibility.Visible;
-            SmallScreenButton.Visibility = Visibility.Collapsed;
-            this.WindowState = WindowState.Normal;
-            itemsPerPage = 1;
+            SetWindowState(WindowState.Normal, 1, SmallScreenButton, FullScreenButton);
+        }
+
+        private void HideButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void SetWindowState(WindowState state, int itemsPerPage, Button hideButton, Button showButton)
+        {
+            WindowState = state;
+            _itemsPerPage = itemsPerPage;
+            hideButton.Visibility = Visibility.Collapsed;
+            showButton.Visibility = Visibility.Visible;
             ApplyPagination();
         }
 
@@ -198,28 +177,20 @@ namespace Hotel.Pages
             }
         }
 
-        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ButtonState == MouseButtonState.Pressed)
-            {
-                this.DragMove();
-            }
-        }
-
         private void UpButton_Click(object sender, RoutedEventArgs e)
         {
-            if (currentPage > 1)
+            if (_currentPage > 1)
             {
-                currentPage--;
+                _currentPage--;
                 ApplyPagination();
             }
         }
 
         private void DownButton_Click(object sender, RoutedEventArgs e)
         {
-            if (currentPage < totalPages)
+            if (_currentPage < _totalPages)
             {
-                currentPage++;
+                _currentPage++;
                 ApplyPagination();
             }
         }
@@ -228,7 +199,10 @@ namespace Hotel.Pages
         {
             SearchText.Clear();
             FilterBox.SelectedIndex = -1;
-            LoadRooms();
+            _displayedRooms = new ObservableCollection<Rooms>(_allRooms);
+            _totalItems = _displayedRooms.Count;
+            _currentPage = 1;
+            ApplyPagination();
         }
 
         private void UpdateStatusButton_Click(object sender, RoutedEventArgs e)
@@ -236,13 +210,26 @@ namespace Hotel.Pages
             try
             {
                 _roomStatusUpdater.UpdateRoomStatus();
-                MessageBox.Show("Информация о доступность номеров актуальная!", "АКТУАЛИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Информация о доступности номеров актуальная!", "АКТУАЛИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Information);
+                LoadRooms();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            LoadRooms();
+        }
+
+        private void Clients_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var clients = new Clients(_name);
+            clients.Owner = this;
+            this.Hide();
+            _navigation.OpenAsDialog(clients);
+        }
+
+        private void Bookings_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+
         }
     }
 }

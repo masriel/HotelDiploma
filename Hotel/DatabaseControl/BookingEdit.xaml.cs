@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
-
 using MySql.Data.MySqlClient;
-
 using Hotel.Classes;
 using Hotel.ItemControl;
 
@@ -21,8 +19,8 @@ namespace Hotel.DatabaseControl
         private readonly ReadConfigFile _config = new ReadConfigFile();
         private int _id, _item = 0, _countClients = 0, _countDay = 1;
         private double _finalAmount;
-        private List<Rooms> _rooms;
-        private List<Meals> _meals;
+        private List<Rooms> _rooms = new List<Rooms>();
+        private List<Meals> _meals = new List<Meals>();
 
         public BookingEdit(int id)
         {
@@ -134,15 +132,33 @@ namespace Hotel.DatabaseControl
         {
             if (MealsList.Items.Count < 3)
             {
-                var meal = new SelectMeal(_countDay);
+                var meal = new SelectMeal();
                 if (meal.ShowDialog() == true)
                 {
-                    _meals.Add(new Meals { ID = meal.ID, Name = meal.Name, Cost = meal.Cost, Quantity = meal.Quantity });
+                    var newMeal = new Meals
+                    {
+                        ID = meal.ID,
+                        Name = meal.Name,
+                        Quantity = meal.Quantity
+                    };
+
+                    _meals.Add(newMeal);
                     MealsList.Items.Add(new ListBoxItem
                     {
-                        Content = $"{meal.Name} ({meal.Quantity}) | {meal.Cost} руб."
+                        Content = $"{meal.Name} ({meal.Quantity}) | {meal.Cost * meal.Quantity} руб.",
+                        Tag = newMeal
                     });
                 }
+            }
+        }
+
+        private void MealsList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (MealsList.SelectedItem is ListBoxItem selectedItem)
+            {
+                Meals selectedMeal = (Meals)selectedItem.Tag;
+                _meals.Remove(selectedMeal);
+                MealsList.Items.Remove(selectedItem);
             }
         }
 
@@ -243,17 +259,18 @@ namespace Hotel.DatabaseControl
 
                 foreach (DataRow row in mealsData.Rows)
                 {
-                    meals.Add(new Meals
+                    var meal = new Meals
                     {
                         ID = Convert.ToInt32(row["mealID"]),
                         Name = Convert.ToString(row["mealName"]),
-                        Cost = Convert.ToDouble(row["mealCost"]),
                         Quantity = Convert.ToInt32(row["quantity"])
-                    });
+                    };
 
+                    meals.Add(meal);
                     MealsList.Items.Add(new ListBoxItem
                     {
-                        Content = $"{row["mealName"]} ({row["quantity"]}) | {row["mealCost"]} руб."
+                        Content = $"{row["mealName"]} ({row["quantity"]}) | {meal.Cost * meal.Quantity} руб.",
+                        Tag = meal
                     });
                 }
             }
