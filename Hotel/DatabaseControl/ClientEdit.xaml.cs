@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Windows;
 
 using MySql.Data.MySqlClient;
@@ -8,9 +7,6 @@ using Hotel.Classes;
 
 namespace Hotel.DatabaseControl
 {
-    /// <summary>
-    /// Interaction logic for ClientEdit.xaml
-    /// </summary>
     public partial class ClientEdit : Window
     {
         private readonly string _connectionString;

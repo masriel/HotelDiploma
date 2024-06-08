@@ -22,7 +22,7 @@
                 <local:BookingsView/>
             </TabItem>
 
-            <TabItem Header="Номера и услуги">
+            <TabItem Header="Номера">
                 <local:RoomsAndServicesView/>
             </TabItem>
         </TabControl>

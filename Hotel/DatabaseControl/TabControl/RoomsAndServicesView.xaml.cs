@@ -1,67 +1,56 @@
 ﻿using Hotel.Classes;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
 using MySql.Data.MySqlClient;
 
 namespace Hotel.DatabaseControl.TabControl
 {
     /// <summary>
-    /// Interaction logic for RoomsAndServicesView.xaml
+    /// Логика взаимодействия для RoomsAndServicesView.xaml
     /// </summary>
     public partial class RoomsAndServicesView : UserControl
     {
-        private string CONNECTION_STRING = String.Empty;
-        private MySqlConnection CONNECTION;
-        private MySqlCommand COMMAND;
+        private readonly string _connectionString;
+        private readonly ConnectionInfo _db;
+        private readonly Navigation _navigation = new Navigation();
 
-        private ConnectionInfo db;
-        private ReadConfigFile _config = new ReadConfigFile();
-
-        Navigation NAVIGATION = new Navigation();
-
-        private DataTable rooms = new DataTable();
-        private DataTable roomsOriginal;
+        private DataTable _rooms;
+        private DataTable _roomsOriginal;
 
         public RoomsAndServicesView()
         {
             InitializeComponent();
-            CONNECTION_STRING = _config.GetConnectionString();
-            db = new ConnectionInfo(CONNECTION_STRING);
+            var config = new ReadConfigFile();
+            _connectionString = config.GetConnectionString();
+            _db = new ConnectionInfo(_connectionString);
         }
 
+        // Метод, вызываемый при загрузке окна
         private void RoomsWindow_Loaded(object sender, RoutedEventArgs e)
         {
             LoadData();
         }
 
+        // Метод для загрузки данных из базы данных
         private void LoadData()
         {
-            rooms = db.GetData("SELECT roomID, roomNumber, Rooms.roomType as typeID, RoomTypes.roomType as type, maxOccupancy, roomPhoto, roomDescription, roomCost, isFree " +
-                               "FROM Rooms " +
-                               "LEFT JOIN RoomTypes ON Rooms.roomType = roomTypeID;");
+            const string query = "SELECT roomID, roomNumber, Rooms.roomType as typeID, RoomTypes.roomType as type, " +
+                "maxOccupancy, roomPhoto, roomDescription, roomCost, isFree " +
+                "FROM Rooms " +
+                "LEFT JOIN RoomTypes ON Rooms.roomType = roomTypeID;";
+            _rooms = _db.GetData(query);
 
-            if (rooms != null)
+            if (_rooms != null)
             {
-                roomsOriginal = rooms.Copy();
-                Rooms.ItemsSource = rooms.DefaultView;
+                _roomsOriginal = _rooms.Copy();
+                Rooms.ItemsSource = _rooms.DefaultView;
                 ConfigureDataGrid();
             }
         }
 
+        // Метод для конфигурации DataGrid
         private void ConfigureDataGrid()
         {
             foreach (DataGridColumn column in Rooms.Columns)
@@ -87,31 +76,34 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для поиска в таблице комнат
         private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string searchText = SearchText.Text.ToLower();
+            var searchText = SearchText.Text.ToLower();
 
             if (string.IsNullOrEmpty(searchText))
             {
-                Rooms.ItemsSource = roomsOriginal.DefaultView;
+                Rooms.ItemsSource = _roomsOriginal.DefaultView;
                 ConfigureDataGrid();
                 return;
             }
 
-            DataView dv = new DataView(roomsOriginal);
-            dv.RowFilter = $"type LIKE '%{searchText}%'";
+            var dv = new DataView(_roomsOriginal)
+            {
+                RowFilter = $"type LIKE '%{searchText}%'"
+            };
 
-            DataTable newTable = roomsOriginal.Clone();
+            var newTable = _roomsOriginal.Clone();
             foreach (DataRowView row in dv)
             {
                 newTable.ImportRow(row.Row);
             }
 
-            foreach (DataRow row in roomsOriginal.Rows)
+            foreach (DataRow row in _roomsOriginal.Rows)
             {
-                string name = row["type"].ToString().ToLower();
+                var type = row["type"].ToString().ToLower();
 
-                if (!name.Contains(searchText))
+                if (!type.Contains(searchText))
                 {
                     newTable.ImportRow(row);
                 }
@@ -127,103 +119,102 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для удаления комнаты
         private void DeleteRoom_Click(object sender, RoutedEventArgs e)
         {
-            if (Rooms.SelectedItem != null)
+            if (Rooms.SelectedItem is DataRowView selectedRow)
             {
-                DataRowView selectedRow = Rooms.SelectedItem as DataRowView;
-                if (selectedRow != null)
+                var roomId = Convert.ToInt32(selectedRow["roomID"]);
+                if (roomId > 0)
                 {
-                    int roomId = Convert.ToInt32(selectedRow["roomID"]);
-                    if (roomId > 0)
+                    if (MessageBox.Show($"Вы действительно хотите удалить комнату {selectedRow["roomNumber"]}?", "УДАЛЕНИЕ", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
-                        if (MessageBox.Show($"Вы действительно хотите удалить комнату {selectedRow["roomNumber"]}?", "УДАЛЕНИЕ", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                        try
                         {
-                            try
+                            const string query = "DELETE FROM Rooms WHERE roomID = @RoomID";
+                            using (var connection = new MySqlConnection(_connectionString))
                             {
-                                string query = $"delete from Rooms where roomID={roomId}";
-                                using (CONNECTION = new MySqlConnection(CONNECTION_STRING))
+                                connection.Open();
+                                using (var command = new MySqlCommand(query, connection))
                                 {
-                                    CONNECTION.Open();
+                                    command.Parameters.AddWithValue("@RoomID", roomId);
+                                    int result = command.ExecuteNonQuery();
 
-                                    COMMAND = new MySqlCommand(query, CONNECTION);
-                                    //int result = COMMAND.ExecuteNonQuery();
-                                    //if (result <= 0)
-                                    //{
-                                    //    MessageBox.Show("Комната не удалена.", "УДАЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
-                                    //    return;
-                                    //}
-                                }
-                                LoadData();
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void ChangeStatus_Click(object sender, RoutedEventArgs e)
-        {
-            if (Rooms.SelectedItem != null)
-            {
-                DataRowView selectedRow = Rooms.SelectedItem as DataRowView;
-                if (selectedRow != null)
-                {
-                    int roomId = Convert.ToInt32(selectedRow["roomID"]);
-                    if (roomId > 0)
-                    {
-                        string status = Convert.ToString(selectedRow["isFree"]);
-                        if (status != null)
-                        {
-                            status = status == "f" ? "t" : "f";
-                            try
-                            {
-                                string query = $"update Rooms set isFree='{status}' where roomID={roomId}";
-                                using (CONNECTION = new MySqlConnection(CONNECTION_STRING))
-                                {
-                                    CONNECTION.Open();
-
-                                    COMMAND = new MySqlCommand(query, CONNECTION);
-                                    int result = COMMAND.ExecuteNonQuery();
                                     if (result <= 0)
                                     {
-                                        MessageBox.Show("Статус не изменен.", "СТАТУС", MessageBoxButton.OK, MessageBoxImage.Error);
+                                        MessageBox.Show("Комната не удалена.", "УДАЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
                                         return;
                                     }
                                 }
-                                LoadData();
                             }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
+                            LoadData();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
                 }
             }
         }
 
+        // Метод для изменения статуса комнаты
+        private void ChangeStatus_Click(object sender, RoutedEventArgs e)
+        {
+            if (Rooms.SelectedItem is DataRowView selectedRow)
+            {
+                var roomId = Convert.ToInt32(selectedRow["roomID"]);
+                if (roomId > 0)
+                {
+                    var isFree = Convert.ToString(selectedRow["isFree"]);
+                    var newStatus = isFree=="t" ? "f" : "t"; // Изменение статуса на противоположный
+                    try
+                    {
+                        const string query = "UPDATE Rooms SET isFree = @IsFree WHERE roomID = @RoomID";
+                        using (var connection = new MySqlConnection(_connectionString))
+                        {
+                            connection.Open();
+                            using (var command = new MySqlCommand(query, connection))
+                            {
+                                command.Parameters.AddWithValue("@IsFree", newStatus);
+                                command.Parameters.AddWithValue("@RoomID", roomId);
+                                int result = command.ExecuteNonQuery();
+
+                                if (result <= 0)
+                                {
+                                    MessageBox.Show("Статус не изменен.", "СТАТУС", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    return;
+                                }
+                            }
+                        }
+                        LoadData();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
+        // Метод для редактирования комнаты
         private void EditRoom_Click(object sender, RoutedEventArgs e)
         {
-            if (Rooms.SelectedItem != null)
+            if (Rooms.SelectedItem is DataRowView selectedRow)
             {
-                DataRowView selectedRow = Rooms.SelectedItem as DataRowView;
-                if (selectedRow != null)
+                var typeId = Convert.ToInt32(selectedRow["typeID"]);
+                if (typeId > 0)
                 {
-                    int typeId = Convert.ToInt32(selectedRow["typeID"]);
-                    if (typeId > 0)
+                    var type = Convert.ToString(selectedRow["type"]);
+                    var occupancy = Convert.ToString(selectedRow["maxOccupancy"]);
+                    var description = Convert.ToString(selectedRow["roomDescription"]);
+                    var cost = Convert.ToString(selectedRow["roomCost"]);
+
+                    if (MessageBox.Show("Вы обновите информацию всех номеров данного вида!", "ОБРАТИТЕ ВНИМАНИЕ", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                     {
-                        string type = Convert.ToString(selectedRow["type"]), occupancy = Convert.ToString(selectedRow["maxOccupancy"]), desc = Convert.ToString(selectedRow["roomDescription"]), cost = Convert.ToString(selectedRow["roomCost"]);
-                        if (MessageBox.Show("Вы обновите информацию всех номеров данного вида!", "ОБРАТИТЕ ВНИМАНИЕ", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
+                        if (new RoomEdit(typeId, type, occupancy, description, cost).ShowDialog() == true)
                         {
-                            if (new RoomEdit(typeId, type, occupancy, desc, cost).ShowDialog() == true)
-                            {
-                                LoadData();
-                            }
+                            LoadData();
                         }
                     }
                 }

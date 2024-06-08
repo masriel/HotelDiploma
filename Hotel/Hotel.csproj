@@ -147,6 +147,7 @@
     </Compile>
     <Compile Include="Classes\BackupDatabase.cs" />
     <Compile Include="Classes\ConfigData.cs" />
+    <Compile Include="Classes\Meals.cs" />
     <Compile Include="Classes\ReadConfigFile.cs" />
     <Compile Include="Classes\Rooms.cs" />
     <Compile Include="Classes\RoomStatusUpdater.cs" />
@@ -183,6 +184,9 @@
     <Compile Include="ItemControl\RoomInfoControl.xaml.cs">
       <DependentUpon>RoomInfoControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ItemControl\SelectMeal.xaml.cs">
+      <DependentUpon>SelectMeal.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ItemControl\SelectTableWindow.xaml.cs">
       <DependentUpon>SelectTableWindow.xaml</DependentUpon>
     </Compile>
@@ -196,9 +200,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="test.xaml.cs">
-      <DependentUpon>test.xaml</DependentUpon>
     </Compile>
     <Page Include="AdminPanel\ControlDatabaseView.xaml">
       <SubType>Designer</SubType>
@@ -263,6 +264,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ItemControl\SelectMeal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ItemControl\SelectTableWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -276,10 +281,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\MainView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

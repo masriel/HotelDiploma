@@ -1,55 +1,49 @@
-﻿using Hotel.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 using MySql.Data.MySqlClient;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+
+using Hotel.Classes;
 
 namespace Hotel.DatabaseControl
 {
     /// <summary>
-    /// Interaction logic for RoomEdit.xaml
+    /// Логика взаимодействия для RoomEdit.xaml
     /// </summary>
     public partial class RoomEdit : Window
     {
-        private string TYPE, OCCUPANCY, DESC, NUMBER, COST;
-        private int ID;
+        private string _type, _occupancy, _desc, _cost;
+        private int _id;
 
-        private string CONNECTION_STRING = String.Empty;
-        private MySqlConnection CONNECTION;
-        private MySqlCommand COMMAND;
-
-        private ConnectionInfo db;
-        private ReadConfigFile _config = new ReadConfigFile();
+        private readonly string _connectionString;
+        private readonly ConnectionInfo _db;
+        private readonly ReadConfigFile _config = new ReadConfigFile();
 
         public RoomEdit(int id, string type, string occupancy, string desc, string cost)
         {
             InitializeComponent();
 
-            ID = id;
-            TYPE = type; OCCUPANCY = occupancy; DESC = desc; COST = cost;
+            _id = id;
+            _type = type;
+            _occupancy = occupancy;
+            _desc = desc;
+            _cost = cost;
 
-            CONNECTION_STRING = _config.GetConnectionString();
-            db = new ConnectionInfo(CONNECTION_STRING);
+            _connectionString = _config.GetConnectionString();
+            _db = new ConnectionInfo(_connectionString);
         }
 
         private void RoomEditWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            TypeRoom.Text = TYPE;
-            DescriptionRoom.Text = DESC;
-            OccupancyRoom.Text = OCCUPANCY;
-            CostRoom.Text = COST;
+            LoadRoomData();
+        }
+
+        private void LoadRoomData()
+        {
+            TypeRoom.Text = _type;
+            DescriptionRoom.Text = _desc;
+            OccupancyRoom.Text = _occupancy;
+            CostRoom.Text = _cost;
         }
 
         private void RoomEditWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -58,17 +52,16 @@ namespace Hotel.DatabaseControl
             {
                 EditRoom();
             }
-            e.Cancel = false;
         }
 
         private void EditRoom()
         {
-            TYPE = TypeRoom.Text;
-            DESC = DescriptionRoom.Text;
-            OCCUPANCY = OccupancyRoom.Text;
-            COST = CostRoom.Text;
+            _type = TypeRoom.Text;
+            _desc = DescriptionRoom.Text;
+            _occupancy = OccupancyRoom.Text;
+            _cost = CostRoom.Text;
 
-            if (!CheckFields(TYPE, OCCUPANCY, DESC, COST))
+            if (!CheckFields(_type, _occupancy, _desc, _cost))
             {
                 MessageBox.Show("Все поля должны быть заполнены!", "РЕДАКТИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -76,31 +69,35 @@ namespace Hotel.DatabaseControl
 
             try
             {
-                string query = $"update RoomTypes set roomType='{TYPE}', maxOccupancy={OCCUPANCY}, roomCost={COST}, roomDescription='{DESC}' where roomTypeID={ID};";
-                using (CONNECTION = new MySqlConnection(CONNECTION_STRING))
-                {
-                    CONNECTION.Open();
-
-                    COMMAND = new MySqlCommand(query, CONNECTION);
-                    int result = COMMAND.ExecuteNonQuery();
-                    if (result <= 0)
-                    {
-                        MessageBox.Show("Информация не обновлена.", "РЕДАКТИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
-                        DialogResult = false;
-                    }
-                    DialogResult = true;
-                }
+                UpdateRoom();
+                MessageBox.Show("Информация обновлена успешно!", "РЕДАКТИРОВАНИЕ", MessageBoxButton.OK, MessageBoxImage.Information);
+                DialogResult = true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+                DialogResult = false;
             }
+        }
+
+        private void UpdateRoom()
+        {
+            string query = "UPDATE RoomTypes SET roomType=@Type, maxOccupancy=@Occupancy, roomCost=@Cost, roomDescription=@Desc WHERE roomTypeID=@ID";
+            var parameters = new[]
+            {
+                new MySqlParameter("@Type", _type),
+                new MySqlParameter("@Occupancy", _occupancy),
+                new MySqlParameter("@Cost", _cost),
+                new MySqlParameter("@Desc", _desc),
+                new MySqlParameter("@ID", _id)
+            };
+
+            _db.ExecuteCommand(query, parameters);
         }
 
         private bool CheckFields(string type, string occupancy, string desc, string cost)
         {
-            if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(occupancy) || string.IsNullOrEmpty(desc) || string.IsNullOrEmpty(cost)) return false;
-            return true;
+            return !string.IsNullOrEmpty(type) && !string.IsNullOrEmpty(occupancy) && !string.IsNullOrEmpty(desc) && !string.IsNullOrEmpty(cost);
         }
     }
 }

@@ -2,24 +2,26 @@
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
+
 using MySql.Data.MySqlClient;
+
 using Hotel.Classes;
-using System.Security.Cryptography;
 
 namespace Hotel.DatabaseControl.TabControl
 {
     /// <summary>
-    /// Interaction logic for BookingsView.xaml
+    /// Логика взаимодействия для BookingsView.xaml
     /// </summary>
     public partial class BookingsView : UserControl
     {
-        private readonly string _connectionString;
-        private readonly ConnectionInfo _db;
-        private readonly Navigation _navigation = new Navigation();
+        private readonly string _connectionString; // Строка подключения к базе данных
+        private readonly ConnectionInfo _db; // Объект для работы с базой данных
+        private readonly Navigation _navigation = new Navigation(); // Объект для навигации (не используется)
 
-        private DataTable _bookings;
-        private DataTable _bookingsOriginal;
+        private DataTable _bookings; // Таблица с бронированиями
+        private DataTable _bookingsOriginal; // Исходная таблица бронирований
 
+        // Конструктор класса
         public BookingsView()
         {
             InitializeComponent();
@@ -28,11 +30,13 @@ namespace Hotel.DatabaseControl.TabControl
             _db = new ConnectionInfo(_connectionString);
         }
 
+        // Метод, вызываемый при загрузке окна
         private void BookingsWindow_Loaded(object sender, RoutedEventArgs e)
         {
             LoadData();
         }
 
+        // Метод для загрузки данных из базы данных
         private void LoadData()
         {
             const string query = "SELECT bookingID, bookingClientsID, bookingNumber, " +
@@ -57,6 +61,7 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для конфигурации DataGrid
         private void ConfigureDataGrid()
         {
             foreach (DataGridColumn column in Bookings.Columns)
@@ -91,13 +96,14 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для поиска в таблице бронирований
         private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
         {
             var searchText = SearchText.Text.ToLower();
 
             if (string.IsNullOrEmpty(searchText))
             {
-                // Restore original table if search string is empty
+                // Восстановление исходной таблицы, если строка поиска пуста
                 Bookings.ItemsSource = _bookingsOriginal.DefaultView;
                 ConfigureDataGrid();
                 return;
@@ -108,15 +114,15 @@ namespace Hotel.DatabaseControl.TabControl
                 RowFilter = $"bookingNumber LIKE '%{searchText}%'"
             };
 
-            var newTable = _bookingsOriginal.Clone(); // Clone original table structure
+            var newTable = _bookingsOriginal.Clone(); // Клонирование структуры исходной таблицы
 
-            // Add filtered rows to the new table
+            // Добавление отфильтрованных строк в новую таблицу
             foreach (DataRowView row in dv)
             {
                 newTable.ImportRow(row.Row);
             }
 
-            // Add remaining rows
+            // Добавление оставшихся строк
             foreach (DataRow row in _bookingsOriginal.Rows)
             {
                 var name = row["bookingNumber"].ToString().ToLower();
@@ -137,6 +143,7 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для удаления бронирования
         private void DeleteBookingButton_Click(object sender, RoutedEventArgs e)
         {
             if (Bookings.SelectedItem is DataRowView selectedRow)
@@ -152,11 +159,12 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для удаления бронирования из базы данных
         private void DeleteBooking(int bookingId)
         {
             try
             {
-                // Retrieve related booking clients and meals IDs before deleting the booking
+                // Получение связанных клиентов и блюд перед удалением бронирования
                 var bookingData = _db.GetData($"SELECT bookingClientsID FROM BookingClients WHERE booking = {bookingId}");
                 var bookingMealsData = _db.GetData($"SELECT bookingMealID FROM BookingMeals WHERE booking = {bookingId}");
 
@@ -167,32 +175,32 @@ namespace Hotel.DatabaseControl.TabControl
 
                     try
                     {
-                        // Delete booking clients
+                        // Удаление связанных клиентов бронирования
                         foreach (DataRow row in bookingData.Rows)
                         {
                             var bookingClientsId = Convert.ToInt32(row["bookingClientsID"]);
                             _db.ExecuteCommand("DELETE FROM BookingClients WHERE bookingClientsID = @BookingClientsID", new MySqlParameter("@BookingClientsID", bookingClientsId));
                         }
 
-                        // Delete booking meals
+                        // Удаление связанных блюд бронирования
                         foreach (DataRow row in bookingMealsData.Rows)
                         {
                             var bookingMealID = Convert.ToInt32(row["bookingMealID"]);
                             _db.ExecuteCommand("DELETE FROM BookingMeals WHERE bookingMealID = @bookingMealID", new MySqlParameter("@bookingMealID", bookingMealID));
                         }
 
-                        // Delete booking
+                        // Удаление самого бронирования
                         _db.ExecuteCommand("DELETE FROM Bookings WHERE bookingID = @BookingID", new MySqlParameter("@BookingID", bookingId));
 
-                        // Commit transaction
+                        // Подтверждение транзакции
                         transaction.Commit();
 
                         MessageBox.Show("Запись удалена!", "УДАЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Information);
-                        LoadData(); // Reload data after deletion
+                        LoadData(); // Перезагрузка данных после удаления
                     }
                     catch (Exception ex)
                     {
-                        // Rollback transaction in case of an error
+                        // Откат транзакции в случае ошибки
                         transaction.Rollback();
                         MessageBox.Show(ex.Message, "УДАЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
@@ -204,6 +212,7 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для редактирования бронирования
         private void EditBookingButton_Click(object sender, RoutedEventArgs e)
         {
             if (Bookings.SelectedItem is DataRowView selectedRow)

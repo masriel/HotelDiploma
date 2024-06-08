@@ -2,23 +2,26 @@
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
+
 using MySql.Data.MySqlClient;
+
 using Hotel.Classes;
 
 namespace Hotel.DatabaseControl.TabControl
 {
     /// <summary>
-    /// Interaction logic for ClientsView.xaml
+    /// Логика взаимодействия для ClientsView.xaml
     /// </summary>
     public partial class ClientsView : UserControl
     {
-        private readonly string _connectionString;
-        private readonly ConnectionInfo _db;
-        private readonly Navigation _navigation = new Navigation();
+        private readonly string _connectionString; // Строка подключения к базе данных
+        private readonly ConnectionInfo _db; // Объект для работы с базой данных
+        private readonly Navigation _navigation = new Navigation(); // Объект для навигации (не используется)
 
-        private DataTable _clients;
-        private DataTable _clientsOriginal;
+        private DataTable _clients; // Таблица с клиентами
+        private DataTable _clientsOriginal; // Исходная таблица клиентов
 
+        // Конструктор класса
         public ClientsView()
         {
             InitializeComponent();
@@ -27,11 +30,13 @@ namespace Hotel.DatabaseControl.TabControl
             _db = new ConnectionInfo(_connectionString);
         }
 
+        // Метод, вызываемый при загрузке окна
         private void ClientsWindow_Loaded(object sender, RoutedEventArgs e)
         {
             LoadData();
         }
 
+        // Метод для загрузки данных из базы данных
         private void LoadData()
         {
             const string query = "SELECT clientID, lastName, firstName, middleName, " +
@@ -49,6 +54,7 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для конфигурации DataGrid
         private void ConfigureDataGrid()
         {
             foreach (DataGridColumn column in Clients.Columns)
@@ -80,13 +86,14 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для поиска в таблице клиентов
         private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
         {
             var searchText = SearchText.Text.ToLower();
 
             if (string.IsNullOrEmpty(searchText))
             {
-                // Restore original table if search string is empty
+                // Восстановление исходной таблицы, если строка поиска пуста
                 Clients.ItemsSource = _clientsOriginal.DefaultView;
                 ConfigureDataGrid();
                 return;
@@ -97,21 +104,21 @@ namespace Hotel.DatabaseControl.TabControl
                 RowFilter = $"lastName LIKE '%{searchText}%' OR firstName LIKE '%{searchText}%'"
             };
 
-            var newTable = _clientsOriginal.Clone(); // Clone original table structure
+            var newTable = _clientsOriginal.Clone(); // Клонирование структуры исходной таблицы
 
-            // Add filtered rows to the new table
+            // Добавление отфильтрованных строк в новую таблицу
             foreach (DataRowView row in dv)
             {
                 newTable.ImportRow(row.Row);
             }
 
-            // Add remaining rows
+            // Добавление оставшихся строк
             foreach (DataRow row in _clientsOriginal.Rows)
             {
                 var name = row["lastName"].ToString().ToLower();
-                var login = row["firstName"].ToString().ToLower();
+                var firstName = row["firstName"].ToString().ToLower();
 
-                if (!name.Contains(searchText) && !login.Contains(searchText))
+                if (!name.Contains(searchText) && !firstName.Contains(searchText))
                 {
                     newTable.ImportRow(row);
                 }
@@ -127,23 +134,24 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для редактирования клиента
         private void EditClient_Click(object sender, RoutedEventArgs e)
         {
             if (Clients.SelectedItem is DataRowView selectedRow)
             {
                 var clientId = Convert.ToInt32(selectedRow["clientID"]);
-                var last = Convert.ToString(selectedRow["lastName"]);
-                var first = Convert.ToString(selectedRow["firstName"]);
-                var middle = Convert.ToString(selectedRow["middleName"]);
-                var phone = Convert.ToString(selectedRow["phoneNumber"]);
+                var lastName = Convert.ToString(selectedRow["lastName"]);
+                var firstName = Convert.ToString(selectedRow["firstName"]);
+                var middleName = Convert.ToString(selectedRow["middleName"]);
+                var phoneNumber = Convert.ToString(selectedRow["phoneNumber"]);
                 var email = selectedRow["email"] != DBNull.Value ? Convert.ToString(selectedRow["email"]) : string.Empty;
-                var birth = Convert.ToString(selectedRow["birthDate"]);
+                var birthDate = Convert.ToString(selectedRow["birthDate"]);
                 var passport = selectedRow["passport"] != DBNull.Value ? Convert.ToInt32(selectedRow["passport"]) : 0;
-                var bc = selectedRow["birthCertificate"] != DBNull.Value ? Convert.ToInt32(selectedRow["birthCertificate"]) : 0;
+                var birthCertificate = selectedRow["birthCertificate"] != DBNull.Value ? Convert.ToInt32(selectedRow["birthCertificate"]) : 0;
 
                 if (clientId > 0)
                 {
-                    var clientEdit = new ClientEdit(clientId, first, last, middle, birth, phone, email, passport, bc);
+                    var clientEdit = new ClientEdit(clientId, firstName, lastName, middleName, birthDate, phoneNumber, email, passport, birthCertificate);
                     if (clientEdit.ShowDialog() == true)
                     {
                         LoadData();
@@ -152,6 +160,7 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для удаления клиента
         private void DeleteClient_Click(object sender, RoutedEventArgs e)
         {
             if (Clients.SelectedItem is DataRowView selectedRow)
@@ -166,10 +175,12 @@ namespace Hotel.DatabaseControl.TabControl
             }
         }
 
+        // Метод для удаления клиента из базы данных
         private void DeleteClient(int clientId)
         {
             try
             {
+                // Получение данных клиента перед удалением
                 var clientData = _db.GetData($"SELECT passport, birthCertificate FROM Clients WHERE clientID = {clientId}");
                 if (clientData.Rows.Count > 0)
                 {
@@ -184,24 +195,29 @@ namespace Hotel.DatabaseControl.TabControl
 
                         try
                         {
+                            // Удаление клиента
                             _db.ExecuteCommand("DELETE FROM Clients WHERE clientID = @ClientID", new MySqlParameter("@ClientID", clientId));
 
+                            // Удаление паспорта клиента
                             if (passportId.HasValue)
                             {
                                 _db.ExecuteCommand("DELETE FROM ClientPassports WHERE passportID = @PassportID", new MySqlParameter("@PassportID", passportId.Value));
                             }
 
+                            // Удаление свидетельства о рождении клиента
                             if (birthCertificateId.HasValue)
                             {
                                 _db.ExecuteCommand("DELETE FROM BirthCertificate WHERE birthCertificateID = @BirthCertificateID", new MySqlParameter("@BirthCertificateID", birthCertificateId.Value));
                             }
 
+                            // Подтверждение транзакции
                             transaction.Commit();
                             MessageBox.Show("Клиент успешно удален!", "УДАЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Information);
-                            LoadData(); // Reload data after deletion
+                            LoadData(); // Перезагрузка данных после удаления
                         }
                         catch (Exception ex)
                         {
+                            // Откат транзакции в случае ошибки
                             transaction.Rollback();
                             MessageBox.Show(ex.Message, "УДАЛЕНИЕ", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
