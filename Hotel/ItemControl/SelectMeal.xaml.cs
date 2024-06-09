@@ -41,7 +41,7 @@ namespace Hotel.ItemControl
                 ID = meal.ID;
                 Name = meal.Name;
                 Quantity = meal.Quantity;
-                Cost = meal.Cost * Quantity;
+                Cost = meal.Cost;
 
                 DialogResult = true;
             }

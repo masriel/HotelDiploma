@@ -189,5 +189,15 @@ namespace Hotel.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Voucher {
+            get {
+                object obj = ResourceManager.GetObject("Voucher", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

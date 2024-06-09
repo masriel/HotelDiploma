@@ -9,13 +9,13 @@ namespace Hotel.Pages
     /// <summary>
     /// Interaction logic for Clients.xaml
     /// </summary>
-    public partial class Clients : Window
+    public partial class AllClients : Window
     {
         private readonly Navigation _navigation = new Navigation();
 
         private readonly string _name;
 
-        public Clients(string name)
+        public AllClients(string name)
         {
             InitializeComponent();
 

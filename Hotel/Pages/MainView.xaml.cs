@@ -221,7 +221,7 @@ namespace Hotel.Pages
 
         private void Clients_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            var clients = new Clients(_name);
+            var clients = new AllClients(_name);
             clients.Owner = this;
             this.Hide();
             _navigation.OpenAsDialog(clients);

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hotel.ItemControl"
         mc:Ignorable="d"
-        Title="Выберите питание" Height="150" Width="250"
+        Title="Выберите питание" Height="150" Width="180"
         WindowStartupLocation="CenterScreen" Background="#E8EAF6"
         ResizeMode="NoResize" WindowStyle="None"
         FontSize="18" FontFamily="Montserrat" 
@@ -23,6 +23,7 @@
         
         <ComboBox Grid.Column="0" Grid.Row="0"
                   x:Name="MealName"
+                  HorizontalContentAlignment="Center"
                   Margin="5">
             <ComboBoxItem Content="Завтрак"/>
             <ComboBoxItem Content="Обед"/>
@@ -32,6 +33,7 @@
         <TextBox Grid.Column="1" Grid.Row="0"
                  x:Name="MealQuantity"
                  VerticalAlignment="Center"
+                 HorizontalContentAlignment="Center"
                  Margin="5"
                  PreviewTextInput="MealQuantity_PreviewTextInput"/>
 

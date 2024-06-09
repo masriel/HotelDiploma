@@ -3,17 +3,14 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
 using Hotel.Classes;
-
 using MySql.Data.MySqlClient;
 
 namespace Hotel.Pages
 {
     public partial class AddClient : Window
     {
-        public int ID;
-        public string Name;
+        public Clients NewClient { get; private set; }
 
         public AddClient()
         {
@@ -169,8 +166,21 @@ namespace Hotel.Pages
                     new MySqlParameter("@BirthCertificateID", birthCertificateId != 0 ? (object)birthCertificateId : DBNull.Value)
                 };
 
-                ID = db.ExecuteInsertAndGetId(queryClient, clientParameters);
-                Name = $"{LastName.Text} {FirstName.Text} {MiddleName.Text}";
+                int ID = db.ExecuteInsertAndGetId(queryClient, clientParameters);
+
+                // Создание объекта класса Clients
+                NewClient = new Clients
+                {
+                    ID = ID,
+                    LastName = _lastName,
+                    FisrtName = _firstName,
+                    MiddleName = _middleName,
+                    BirthDate = _birthDate,
+                    PhoneNumber = _phone,
+                    Email = _email,
+                    PassportID = passportId,
+                    BirthCertificate = birthCertificateId
+                };
 
                 DialogResult = true;
             }
