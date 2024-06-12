@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Hotel.Classes;
+using MySql.Data.MySqlClient;
+using System;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
-
-using MySql.Data.MySqlClient;
-
-using Hotel.Classes;
 
 namespace Hotel.DatabaseControl.TabControl
 {
@@ -39,18 +37,25 @@ namespace Hotel.DatabaseControl.TabControl
         // Метод для загрузки данных из базы данных
         private void LoadData()
         {
-            const string query = "SELECT clientID, lastName, firstName, middleName, " +
-                "DATE_FORMAT(birthDate, '%d.%m.%Y') AS birthDate, phoneNumber, email, passport, birthCertificate " +
-                "FROM Clients " +
-                "LEFT JOIN ClientPassports ON passport = passportID " +
-                "LEFT JOIN BirthCertificate ON birthCertificate = birthCertificateID;";
-            _clients = _db.GetData(query);
-
-            if (_clients != null)
+            try
             {
-                _clientsOriginal = _clients.Copy();
-                Clients.ItemsSource = _clients.DefaultView;
-                ConfigureDataGrid();
+                const string query = "SELECT clientID, lastName, firstName, middleName, " +
+                    "DATE_FORMAT(birthDate, '%d.%m.%Y') AS birthDate, phoneNumber, email, passport, birthCertificate " +
+                    "FROM Clients " +
+                    "LEFT JOIN ClientPassports ON passport = passportID " +
+                    "LEFT JOIN BirthCertificate ON birthCertificate = birthCertificateID;";
+                _clients = _db.GetData(query);
+
+                if (_clients != null)
+                {
+                    _clientsOriginal = _clients.Copy();
+                    Clients.ItemsSource = _clients.DefaultView;
+                    ConfigureDataGrid();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке данных: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -89,89 +94,109 @@ namespace Hotel.DatabaseControl.TabControl
         // Метод для поиска в таблице клиентов
         private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var searchText = SearchText.Text.ToLower();
-
-            if (string.IsNullOrEmpty(searchText))
+            try
             {
-                // Восстановление исходной таблицы, если строка поиска пуста
-                Clients.ItemsSource = _clientsOriginal.DefaultView;
-                ConfigureDataGrid();
-                return;
-            }
+                var searchText = SearchText.Text.ToLower();
 
-            var dv = new DataView(_clientsOriginal)
-            {
-                RowFilter = $"lastName LIKE '%{searchText}%' OR firstName LIKE '%{searchText}%'"
-            };
-
-            var newTable = _clientsOriginal.Clone(); // Клонирование структуры исходной таблицы
-
-            // Добавление отфильтрованных строк в новую таблицу
-            foreach (DataRowView row in dv)
-            {
-                newTable.ImportRow(row.Row);
-            }
-
-            // Добавление оставшихся строк
-            foreach (DataRow row in _clientsOriginal.Rows)
-            {
-                var name = row["lastName"].ToString().ToLower();
-                var firstName = row["firstName"].ToString().ToLower();
-
-                if (!name.Contains(searchText) && !firstName.Contains(searchText))
+                if (string.IsNullOrEmpty(searchText))
                 {
-                    newTable.ImportRow(row);
+                    // Восстановление исходной таблицы, если строка поиска пуста
+                    Clients.ItemsSource = _clientsOriginal.DefaultView;
+                    ConfigureDataGrid();
+                    return;
+                }
+
+                var dv = new DataView(_clientsOriginal)
+                {
+                    RowFilter = $"lastName LIKE '%{searchText}%' OR firstName LIKE '%{searchText}%'"
+                };
+
+                var newTable = _clientsOriginal.Clone(); // Клонирование структуры исходной таблицы
+
+                // Добавление отфильтрованных строк в новую таблицу
+                foreach (DataRowView row in dv)
+                {
+                    newTable.ImportRow(row.Row);
+                }
+
+                // Добавление оставшихся строк
+                foreach (DataRow row in _clientsOriginal.Rows)
+                {
+                    var name = row["lastName"].ToString().ToLower();
+                    var firstName = row["firstName"].ToString().ToLower();
+
+                    if (!name.Contains(searchText) && !firstName.Contains(searchText))
+                    {
+                        newTable.ImportRow(row);
+                    }
+                }
+
+                Clients.ItemsSource = newTable.DefaultView;
+                ConfigureDataGrid();
+
+                if (newTable.Rows.Count > 0)
+                {
+                    Clients.SelectedIndex = 0;
+                    Clients.ScrollIntoView(Clients.SelectedItem);
                 }
             }
-
-            Clients.ItemsSource = newTable.DefaultView;
-            ConfigureDataGrid();
-
-            if (newTable.Rows.Count > 0)
+            catch (Exception ex)
             {
-                Clients.SelectedIndex = 0;
-                Clients.ScrollIntoView(Clients.SelectedItem);
+                MessageBox.Show($"Ошибка при поиске: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         // Метод для редактирования клиента
         private void EditClient_Click(object sender, RoutedEventArgs e)
         {
-            if (Clients.SelectedItem is DataRowView selectedRow)
+            try
             {
-                var clientId = Convert.ToInt32(selectedRow["clientID"]);
-                var lastName = Convert.ToString(selectedRow["lastName"]);
-                var firstName = Convert.ToString(selectedRow["firstName"]);
-                var middleName = Convert.ToString(selectedRow["middleName"]);
-                var phoneNumber = Convert.ToString(selectedRow["phoneNumber"]);
-                var email = selectedRow["email"] != DBNull.Value ? Convert.ToString(selectedRow["email"]) : string.Empty;
-                var birthDate = Convert.ToString(selectedRow["birthDate"]);
-                var passport = selectedRow["passport"] != DBNull.Value ? Convert.ToInt32(selectedRow["passport"]) : 0;
-                var birthCertificate = selectedRow["birthCertificate"] != DBNull.Value ? Convert.ToInt32(selectedRow["birthCertificate"]) : 0;
-
-                if (clientId > 0)
+                if (Clients.SelectedItem is DataRowView selectedRow)
                 {
-                    var clientEdit = new ClientEdit(clientId, firstName, lastName, middleName, birthDate, phoneNumber, email, passport, birthCertificate);
-                    if (clientEdit.ShowDialog() == true)
+                    var clientId = Convert.ToInt32(selectedRow["clientID"]);
+                    var lastName = Convert.ToString(selectedRow["lastName"]);
+                    var firstName = Convert.ToString(selectedRow["firstName"]);
+                    var middleName = Convert.ToString(selectedRow["middleName"]);
+                    var phoneNumber = Convert.ToString(selectedRow["phoneNumber"]);
+                    var email = selectedRow["email"] != DBNull.Value ? Convert.ToString(selectedRow["email"]) : string.Empty;
+                    var birthDate = Convert.ToString(selectedRow["birthDate"]);
+                    var passport = selectedRow["passport"] != DBNull.Value ? Convert.ToInt32(selectedRow["passport"]) : 0;
+                    var birthCertificate = selectedRow["birthCertificate"] != DBNull.Value ? Convert.ToInt32(selectedRow["birthCertificate"]) : 0;
+
+                    if (clientId > 0)
                     {
-                        LoadData();
+                        var clientEdit = new ClientEdit(clientId, firstName, lastName, middleName, birthDate, phoneNumber, email, passport, birthCertificate);
+                        if (clientEdit.ShowDialog() == true)
+                        {
+                            LoadData();
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при редактировании клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         // Метод для удаления клиента
         private void DeleteClient_Click(object sender, RoutedEventArgs e)
         {
-            if (Clients.SelectedItem is DataRowView selectedRow)
+            try
             {
-                var clientId = Convert.ToInt32(selectedRow["clientID"]);
-
-                if (MessageBox.Show("Вы уверены, что хотите удалить клиента?", "УДАЛЕНИЕ", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (Clients.SelectedItem is DataRowView selectedRow)
                 {
-                    DeleteClient(clientId);
-                    LoadData();
+                    var clientId = Convert.ToInt32(selectedRow["clientID"]);
+
+                    if (MessageBox.Show("Вы уверены, что хотите удалить клиента?", "УДАЛЕНИЕ", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        DeleteClient(clientId);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при удалении клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
-
-using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Win32;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Hotel
 {
@@ -13,7 +12,8 @@ namespace Hotel
         {
             var saveFileDialog = new SaveFileDialog { Filter = "Word Documents (*.docx)|*.docx|All Files (*.*)|*.*", FileName = outputPath };
 
-            if (saveFileDialog.ShowDialog() == true) {
+            if (saveFileDialog.ShowDialog() == true)
+            {
                 outputPath = saveFileDialog.FileName;
 
                 // Копируем шаблон в новый файл

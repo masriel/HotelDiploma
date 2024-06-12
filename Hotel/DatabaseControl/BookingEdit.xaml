@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock x:Name="BookNumber"
-                   Text="A000A" Margin="10"
+                   Text="A000A" Margin="30 10"
                    FontWeight="ExtraBold" FontSize="40"
                    VerticalAlignment="Center"/>
 
@@ -69,8 +69,9 @@
                      FontFamily="Montserrat"
                      Foreground="#5C6BC0"
                      FontSize="16"
-                     Style="{StaticResource MaterialDesignChoiceChipListBox}">
-            </ListBox>
+                     Style="{StaticResource MaterialDesignChoiceChipListBox}"
+                     MouseDoubleClick="MealsList_MouseDoubleClick"/>
+
             <Button x:Name="AddMeal"
                     ToolTip="Icon"
                     Margin="10"

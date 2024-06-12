@@ -1,21 +1,21 @@
-﻿using System;
-using System.IO;
+﻿using Hotel.Classes;
+using Hotel.ItemControl;
+using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-
-using Hotel.Classes;
-using Hotel.ItemControl;
-
-using MySql.Data.MySqlClient;
 
 namespace Hotel.Pages
 {
     public partial class MakeReservation : Window
     {
+        private readonly Navigation _navigation = new Navigation();
+
         private ObservableCollection<Rooms> _freeRooms;
         private ObservableCollection<Meals> _meals = new ObservableCollection<Meals>();
         private ObservableCollection<Clients> _clients = new ObservableCollection<Clients>();
@@ -25,16 +25,24 @@ namespace Hotel.Pages
             InitializeComponent();
         }
 
+        // Метод обработки загрузки окна
         private void ReservationWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            //устанавливаем даты заезда и выезда по умолчанию
-            SetDates();
+            try
+            {
+                // Устанавливаем даты заезда и выезда по умолчанию
+                SetDates();
 
-            //получаем свободные номера для заселения/бронирования
-            PopulateFreeRoomsComboBox();
+                // Получаем свободные номера для заселения/бронирования
+                PopulateFreeRoomsComboBox();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при инициализации окна: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        //метод для заполнения ComboBox со свободными номерами
+        // Метод для заполнения ComboBox со свободными номерами
         private void PopulateFreeRoomsComboBox()
         {
             try
@@ -63,54 +71,75 @@ namespace Hotel.Pages
             }
         }
 
-        //метод для установки дат по умолчанию
+        // Метод для установки дат по умолчанию
         private void SetDates()
         {
-            ArrivalDatePicker.SelectedDate = DateTime.Now;
-            DepartureDatePicker.SelectedDate = DateTime.Now.AddDays(1);
+            try
+            {
+                ArrivalDatePicker.SelectedDate = DateTime.Now;
+                DepartureDatePicker.SelectedDate = DateTime.Now.AddDays(1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при установке дат по умолчанию: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        //метод для добавления нового клиента
+        // Метод для добавления нового клиента
         private void AddClientButton_Click(object sender, RoutedEventArgs e)
         {
-            // Открываем окно для добавления клиента
-            AddClient addClientWindow = new AddClient();
-            if (addClientWindow.ShowDialog() == true)
+            try
             {
-                // Добавляем клиента в список клиентов
-                var newClient = addClientWindow.NewClient;
-                ClientsList.Items.Add(new ListBoxItem
+                // Открываем окно для добавления клиента
+                AddClient addClientWindow = new AddClient();
+                if (addClientWindow.ShowDialog() == true)
                 {
-                    Content = $"{newClient.LastName} {newClient.FisrtName} {newClient.MiddleName}",
-                    Tag = newClient
-                });
-                _clients.Add(newClient);
+                    // Добавляем клиента в список клиентов
+                    var newClient = addClientWindow.NewClient;
+                    ClientsList.Items.Add(new ListBoxItem
+                    {
+                        Content = $"{newClient.LastName} {newClient.FisrtName} {newClient.MiddleName}",
+                        Tag = newClient
+                    });
+                    _clients.Add(newClient);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при добавлении клиента: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        //метод для добавления питания
+        // Метод для добавления питания
         private void AddMealButton_Click(object sender, RoutedEventArgs e)
         {
-            SelectMeal meal = new SelectMeal();
-            if (meal.ShowDialog() == true)
+            try
             {
-                var newMeal = new Meals
+                SelectMeal meal = new SelectMeal();
+                if (meal.ShowDialog() == true)
                 {
-                    ID = meal.ID,
-                    Name = meal.Name,
-                    Quantity = meal.Quantity
-                };
+                    var newMeal = new Meals
+                    {
+                        ID = meal.ID,
+                        Name = meal.Name,
+                        Quantity = meal.Quantity
+                    };
 
-                _meals.Add(newMeal);
-                MealsList.Items.Add(new ListBoxItem
-                {
-                    Content = $"{meal.Name} ({meal.Quantity}) | {meal.Cost} руб.",
-                    Tag = newMeal
-                });
+                    _meals.Add(newMeal);
+                    MealsList.Items.Add(new ListBoxItem
+                    {
+                        Content = $"{meal.Name} ({meal.Quantity}) | {meal.Cost} руб.",
+                        Tag = newMeal
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при добавлении питания: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        //метод добавления бронирования
+        // Метод добавления бронирования
         private void AddBookingButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -145,10 +174,10 @@ namespace Hotel.Pages
 
                 string arrivalDate = ArrivalDatePicker.SelectedDate.Value.ToString("yyyy-MM-dd");
                 string departureDate = DepartureDatePicker.SelectedDate.Value.ToString("yyyy-MM-dd");
-                int days = (DepartureDatePicker.SelectedDate.Value - ArrivalDatePicker.SelectedDate.Value).Days;
+                string days = (DepartureDatePicker.SelectedDate.Value - ArrivalDatePicker.SelectedDate.Value).Days.ToString();
                 int roomID = _freeRooms[SelectRoomBox.SelectedIndex].ID;
                 int[] clientsID = _clients.Select(c => c.ID).ToArray();
-                double amount = CalculateFinalAmount(clientsID.Length, _meals.ToArray(), days);
+                double amount = CalculateFinalAmount(clientsID.Length, _meals.ToArray(), Convert.ToInt32(days));
                 string bookingNumber = GenerateBookingNumber();
 
                 string connectionString = new ReadConfigFile().GetConnectionString();
@@ -172,7 +201,7 @@ namespace Hotel.Pages
 
                 if (DateTime.Parse(arrivalDate) == DateTime.Now.Date)
                 {
-                    string queryRoom = "INSERT INTO rooms (isFree) VALUES (@isFree) WHERE roomID=@roomID; ";
+                    string queryRoom = "UPDATE rooms SET isFree=@isFree WHERE roomID=@roomID; ";
 
                     MySqlParameter[] roomParameters = new MySqlParameter[]
                     {
@@ -180,7 +209,7 @@ namespace Hotel.Pages
                         new MySqlParameter("@roomID", roomID)
                     };
 
-                    db.ExecuteInsertAndGetId(queryRoom, roomParameters);
+                    db.ExecuteCommand(queryRoom, roomParameters);
                 }
 
                 // Вставка данных клиентов бронирования
@@ -210,131 +239,187 @@ namespace Hotel.Pages
 
                 // Генерация документов
                 GenerateDocuments(bookingNumber, arrivalDate, departureDate, days, amount);
+
+                MessageBox.Show("Бронирование успешно добавлено!", "ИНФОРМАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                this.Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при добавлении бронирования: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
         }
 
-        //формирование документов
-        private void GenerateDocuments(string bookingNumber, string arrivalDate, string departureDate, int days, double amount)
+        // Метод формирования документов
+        private void GenerateDocuments(string bookingNumber, string arrivalDate, string departureDate, string days, double amount)
         {
-            WordDocumentManager wordManager = new WordDocumentManager();
-
-            // Если заезд не с текущего дня, то генерируем ваучер бронирования
-            if (DateTime.Parse(arrivalDate) > DateTime.Now.Date)
+            try
             {
-                // Подготовка данных для ваучера
-                var voucherData = new Dictionary<string, string>
+                WordDocumentManager wordManager = new WordDocumentManager();
+
+                // Если заезд не с текущего дня, то генерируем ваучер бронирования
+                if (DateTime.Parse(arrivalDate) > DateTime.Now.Date)
                 {
-                    { "BookingNumber", bookingNumber },
-                    { "Weekday1", DateTime.Parse(arrivalDate).ToString("dddd") },
-                    { "Day1", DateTime.Parse(arrivalDate).ToString("dd") },
-                    { "Month1", DateTime.Parse(arrivalDate).ToString("MMMM") },
-                    { "Year1", DateTime.Parse(arrivalDate).ToString("yyyy") },
-                    { "Weekday2", DateTime.Parse(departureDate).ToString("dddd") },
-                    { "Day2", DateTime.Parse(departureDate).ToString("dd") },
-                    { "Month2", DateTime.Parse(departureDate).ToString("MMMM") },
-                    { "Year2", DateTime.Parse(departureDate).ToString("yyyy") },
-                    { "Info", SelectRoomBox.Text },
-                    { "Days", days.ToString() },
-                    { "Clients", _clients.Count.ToString() },
-                    { "Amount", amount.ToString() }
-                };
-                string voucherTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory.Replace(@"\bin\Debug\", @"\Resources"), "Voucher.docx");
-                string voucherOutputPath = $"Voucher_{bookingNumber}.docx";
-                wordManager.FillTemplate(voucherTemplatePath, voucherOutputPath, voucherData);
-            }
-
-            // Подготовка данных для чека об оплате
-            var paymentReceiptData = new Dictionary<string, string>
-            {
-                { "RandNumber", new Random().Next(100000, 999999).ToString() },
-                { "Day", DateTime.Now.ToString("dd") },
-                { "Month", DateTime.Now.ToString("MMMM") },
-                { "Year", DateTime.Now.ToString("yyyy") },
-                { "Clients", string.Join(", ", _clients.Select(c => c.LastName + " " + c.FisrtName)) },
-                { "RoomNumber", _freeRooms[SelectRoomBox.SelectedIndex].Number },
-                { "ArrivalDate", DateTime.Parse(arrivalDate).ToString("dd.MM.yyyy") },
-                { "DepartureDate", DateTime.Parse(departureDate).ToString("dd.MM.yyyy") },
-                { "Days", days.ToString() },
-                { "RoomCost", _freeRooms[SelectRoomBox.SelectedIndex].Cost },
-                { "RoomAmount", (Convert.ToDouble(_freeRooms[SelectRoomBox.SelectedIndex].Cost) * days).ToString() },
-                { "Meals", string.Join(", ", _meals.Select(m => m.Name)) },
-                { "MealAmount", _meals.Sum(m => m.Cost * m.Quantity).ToString() },
-                { "BookingAmount", amount.ToString() }
-            };
-            string paymentReceiptTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory.Replace(@"\bin\Debug\", @"\Resources"), "PaymentReceipt.docx");
-            string paymentReceiptOutputPath = $"PaymentReceipt_{bookingNumber}.docx";
-            wordManager.FillTemplate(paymentReceiptTemplatePath, paymentReceiptOutputPath, paymentReceiptData);
-
-            // Если заезд с текущего дня, то генерируем анкеты клиентов
-            if (DateTime.Parse(arrivalDate) == DateTime.Now.Date)
-            {
-                foreach (var client in _clients)
-                {
-                    var clientProfileData = new Dictionary<string, string>
+                    // Подготовка данных для ваучера
+                    var voucherData = new Dictionary<string, string>
                     {
-                        { "LastName", client.LastName },
-                        { "FirstName", client.FisrtName },
-                        { "MiddleName", client.MiddleName },
-                        { "BirthDate", client.BirthDate },
-                        { "PhoneNumber", client.PhoneNumber },
-                        { "Email", client.Email },
-                        { "RoomNumber", _freeRooms[SelectRoomBox.SelectedIndex].Number }
+                        { "BookingNumber", bookingNumber },
+                        { "Weekday1", DateTime.Parse(arrivalDate).ToString("dddd") },
+                        { "Day1", DateTime.Parse(arrivalDate).ToString("dd") },
+                        { "Month1", DateTime.Parse(arrivalDate).ToString("MMMM") },
+                        { "Year1", DateTime.Parse(arrivalDate).ToString("yyyy") },
+                        { "Weekday2", DateTime.Parse(departureDate).ToString("dddd") },
+                        { "Day2", DateTime.Parse(departureDate).ToString("dd") },
+                        { "Month2", DateTime.Parse(departureDate).ToString("MMMM") },
+                        { "Year2", DateTime.Parse(departureDate).ToString("yyyy") },
+                        { "Info", SelectRoomBox.Text },
+                        { "Days", days },
+                        { "Clients", _clients.Count.ToString() },
+                        { "Amount", amount.ToString() }
                     };
-                    string clientProfileTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory.Replace(@"\bin\Debug\", @"\Resources"), "ClientProfile.docx");
-                    string clientProfileOutputPath = $"ClientProfile_{client.LastName}_{client.FisrtName}.docx";
-                    wordManager.FillTemplate(clientProfileTemplatePath, clientProfileOutputPath, clientProfileData);
+                    
+                    string voucherTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Voucher.docx");
+                    string voucherOutputPath = $"Voucher_{bookingNumber}.docx";
+                    wordManager.FillTemplate(voucherTemplatePath, voucherOutputPath, voucherData);
+                }
+
+                // Подготовка данных для чека об оплате
+                var paymentReceiptData = new Dictionary<string, string>
+                {
+                    { "RandNumber", new Random().Next(100000, 999999).ToString() },
+                    { "Day", DateTime.Now.ToString("dd") },
+                    { "Month", DateTime.Now.ToString("MMMM") },
+                    { "Year", DateTime.Now.ToString("yyyy") },
+                    { "Clients", string.Join(", ", _clients.Select(c => c.LastName + " " + c.FisrtName)) },
+                    { "RoomNumber", _freeRooms[SelectRoomBox.SelectedIndex].Number },
+                    { "ArrivalDate", DateTime.Parse(arrivalDate).ToString("dd.MM.yyyy") },
+                    { "DepartureDate", DateTime.Parse(departureDate).ToString("dd.MM.yyyy") },
+                    { "Count", Convert.ToInt32(days).ToString() },
+                    { "RoomCost", _freeRooms[SelectRoomBox.SelectedIndex].Cost },
+                    { "RoomAmount", (Convert.ToDouble(_freeRooms[SelectRoomBox.SelectedIndex].Cost) * Convert.ToInt32(days)).ToString() },
+                    { "Meals", string.Join(", ", _meals.Select(m => m.Name)) },
+                    { "MealAmount", _meals.Sum(m => m.Cost * m.Quantity).ToString() },
+                    { "BookingAmount", amount.ToString() }
+                };
+                string paymentReceiptTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\PaymentReceipt.docx");
+                string paymentReceiptOutputPath = $"PaymentReceipt_{bookingNumber}.docx";
+                wordManager.FillTemplate(paymentReceiptTemplatePath, paymentReceiptOutputPath, paymentReceiptData);
+
+                // Если заезд с текущего дня, то генерируем анкеты клиентов
+                if (DateTime.Parse(arrivalDate) == DateTime.Now.Date)
+                {
+                    foreach (var client in _clients)
+                    {
+                        var clientProfileData = new Dictionary<string, string>
+                        {
+                            { "LastName", client.LastName },
+                            { "FirstName", client.FisrtName },
+                            { "MiddleName", client.MiddleName },
+                            { "BirthDate", client.BirthDate },
+                            { "PhoneNumber", client.PhoneNumber },
+                            { "Email", client.Email },
+                            { "RoomNumber", _freeRooms[SelectRoomBox.SelectedIndex].Number }
+                        };
+                        string clientProfileTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\ClientProfile.docx");
+                        string clientProfileOutputPath = $"ClientProfile_{client.LastName}_{client.FisrtName}.docx";
+                        wordManager.FillTemplate(clientProfileTemplatePath, clientProfileOutputPath, clientProfileData);
+                    }
                 }
             }
-        }
-
-        //расчет итоговой суммы
-        private double CalculateFinalAmount(int clients, Meals[] meals, int days)
-        {
-            double amount = 0;
-            double roomCost = Convert.ToDouble(_freeRooms[SelectRoomBox.SelectedIndex].Cost);
-            double mealsCost = meals.Sum(meal => meal.Cost * meal.Quantity);
-
-            // Стоимость проживания и питания на всех клиентов
-            amount = (roomCost * days + mealsCost) * clients;
-
-            return amount;
-        }
-
-        //генерация номера бронирования
-        private string GenerateBookingNumber()
-        {
-            var random = new Random();
-            char firstLetter = (char)('A' + random.Next(0, 26));
-            char lastLetter = (char)('A' + random.Next(0, 26));
-            string digits = random.Next(0, 1000).ToString("D3");
-
-            return $"{firstLetter}{digits}{lastLetter}";
-        }
-
-        //удаления клиента из бронирования
-        private void ClientsList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (ClientsList.SelectedItem != null)
+            catch (Exception ex)
             {
-                int selectedIndex = ClientsList.SelectedIndex;
-                ClientsList.Items.RemoveAt(selectedIndex);
-                _clients.RemoveAt(selectedIndex);
+                MessageBox.Show($"Ошибка при генерации документов: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        //удаление питания из бронирования
+        // Метод расчета итоговой суммы
+        private double CalculateFinalAmount(int clients, Meals[] meals, int days)
+        {
+            try
+            {
+                double amount = 0;
+                double roomCost = Convert.ToDouble(_freeRooms[SelectRoomBox.SelectedIndex].Cost);
+                double mealsCost = meals.Sum(meal => meal.Cost * meal.Quantity);
+
+                // Стоимость проживания и питания на всех клиентов
+                amount = (roomCost * days + mealsCost) * clients;
+
+                return amount;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при расчете итоговой суммы: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+                return 0;
+            }
+        }
+
+        // Метод генерации номера бронирования
+        private string GenerateBookingNumber()
+        {
+            try
+            {
+                var random = new Random();
+                char firstLetter = (char)('A' + random.Next(0, 26));
+                char lastLetter = (char)('A' + random.Next(0, 26));
+                string digits = random.Next(0, 1000).ToString("D3");
+
+                return $"{firstLetter}{digits}{lastLetter}";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при генерации номера бронирования: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+                return "ERR000X";
+            }
+        }
+
+        // Метод удаления клиента из бронирования
+        private void ClientsList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (ClientsList.SelectedItem != null)
+                {
+                    int selectedIndex = ClientsList.SelectedIndex;
+                    ClientsList.Items.RemoveAt(selectedIndex);
+                    _clients.RemoveAt(selectedIndex);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при удалении клиента: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Метод удаления питания из бронирования
         private void MealsList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (MealsList.SelectedItem != null)
+            try
             {
-                int selectedIndex = MealsList.SelectedIndex;
-                var selectedMeal = (Meals)((ListBoxItem)MealsList.SelectedItem).Tag;
-                _meals.Remove(selectedMeal);
-                MealsList.Items.RemoveAt(selectedIndex);
+                if (MealsList.SelectedItem != null)
+                {
+                    int selectedIndex = MealsList.SelectedIndex;
+                    var selectedMeal = (Meals)((ListBoxItem)MealsList.SelectedItem).Tag;
+                    _meals.Remove(selectedMeal);
+                    MealsList.Items.RemoveAt(selectedIndex);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при удалении питания: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Метод обработки закрытия окна
+        private void ReservationWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            try
+            {
+                this.Owner.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при закрытии окна: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

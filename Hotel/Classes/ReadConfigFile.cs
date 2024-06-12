@@ -1,8 +1,7 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using System;
-
-using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Hotel.Classes
 {

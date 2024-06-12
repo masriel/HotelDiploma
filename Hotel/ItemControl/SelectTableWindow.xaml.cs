@@ -18,8 +18,8 @@ namespace Hotel.ItemControl
         private void Users_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             Tables.Clear();
-            Tables.Add( "Users" );
-            Tables.Add( "UserTypes" );
+            Tables.Add("Users");
+            Tables.Add("UserTypes");
             DialogResult = true;
         }
 
@@ -42,7 +42,7 @@ namespace Hotel.ItemControl
         {
             Tables.Clear();
             Tables.Add("Clients");
-            Tables.Add("ClientPassport");
+            Tables.Add("ClientPassports");
             Tables.Add("BirthCertificate");
             DialogResult = true;
         }
@@ -53,7 +53,7 @@ namespace Hotel.ItemControl
             Tables.Add("Bookings");
             Tables.Add("BookingClients");
             Tables.Add("BookingMeals");
-            DialogResult = true;    
+            DialogResult = true;
         }
     }
 }

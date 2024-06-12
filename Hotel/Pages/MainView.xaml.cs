@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Hotel.Classes;
+using Hotel.ItemControl;
+using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -7,11 +10,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
-using Hotel.ItemControl;
-
-using Hotel.Classes;
-using MySql.Data.MySqlClient;
 
 namespace Hotel.Pages
 {
@@ -34,9 +32,18 @@ namespace Hotel.Pages
             InitializeComponent();
             _name = name;
             _db = new ConnectionInfo(_config.GetConnectionString());
+
+            App.Current.Exit += Current_Exit; // Подписываемся на событие закрытия приложения
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Current_Exit(object sender, ExitEventArgs e)
+        {
+            BackupDatabase exit = new BackupDatabase();
+            // Создаем резервную копию базы данных при закрытии приложения
+            exit.CreateExitBackup();
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             WorkerName.Text = _name;
             LoadRooms();
@@ -44,6 +51,8 @@ namespace Hotel.Pages
             FilterBox.SelectionChanged += (s, args) => FilterAndSortRooms();
         }
 
+
+        // Загрузка всех номеров из базы данных
         private void LoadRooms()
         {
             _allRooms = new ObservableCollection<Rooms>(GetRoomsFromDatabase());
@@ -52,6 +61,7 @@ namespace Hotel.Pages
             ApplyPagination();
         }
 
+        // Получение номеров из базы данных
         private IEnumerable<Rooms> GetRoomsFromDatabase()
         {
             var roomData = _db.GetData("SELECT roomID, roomNumber, RoomTypes.roomType as typeID, RoomTypes.roomType, maxOccupancy, roomDescription, roomPhoto, roomCost, isFree " +
@@ -71,6 +81,7 @@ namespace Hotel.Pages
                    };
         }
 
+        // Применение пагинации к отображаемым номерам
         private void ApplyPagination()
         {
             _totalPages = (int)Math.Ceiling((double)_totalItems / _itemsPerPage);
@@ -80,6 +91,7 @@ namespace Hotel.Pages
             TotalPages.Text = _totalPages.ToString();
         }
 
+        // Фильтрация и сортировка номеров по введенному тексту и выбранному типу
         private void FilterAndSortRooms()
         {
             string searchText = SearchText.Text.ToLower();
@@ -110,6 +122,7 @@ namespace Hotel.Pages
             ApplyPagination();
         }
 
+        // Сортировка номеров по возрастанию или убыванию
         private void SortRooms(bool ascending)
         {
             string filterType = (FilterBox.SelectedItem as ComboBoxItem)?.Content?.ToString();
@@ -140,6 +153,7 @@ namespace Hotel.Pages
             SortRooms(true);
         }
 
+        // Обработчик кнопки закрытия приложения
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Закрыть приложение?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -148,21 +162,25 @@ namespace Hotel.Pages
             }
         }
 
+        // Обработчик кнопки перехода в полноэкранный режим
         private void FullScreenButton_Click(object sender, RoutedEventArgs e)
         {
             SetWindowState(WindowState.Maximized, 2, FullScreenButton, SmallScreenButton);
         }
 
+        // Обработчик кнопки перехода в нормальный режим окна
         private void SmallScreenButton_Click(object sender, RoutedEventArgs e)
         {
             SetWindowState(WindowState.Normal, 1, SmallScreenButton, FullScreenButton);
         }
 
+        // Обработчик кнопки сворачивания окна
         private void HideButton_Click(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
         }
 
+        // Метод для установки состояния окна и настройки пагинации
         private void SetWindowState(WindowState state, int itemsPerPage, Button hideButton, Button showButton)
         {
             WindowState = state;
@@ -172,6 +190,7 @@ namespace Hotel.Pages
             ApplyPagination();
         }
 
+        // Обработчик кнопки выхода из системы
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Выйти из системы?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -180,6 +199,7 @@ namespace Hotel.Pages
             }
         }
 
+        // Обработчик кнопки перехода на предыдущую страницу
         private void UpButton_Click(object sender, RoutedEventArgs e)
         {
             if (_currentPage > 1)
@@ -189,6 +209,7 @@ namespace Hotel.Pages
             }
         }
 
+        // Обработчик кнопки перехода на следующую страницу
         private void DownButton_Click(object sender, RoutedEventArgs e)
         {
             if (_currentPage < _totalPages)
@@ -198,6 +219,7 @@ namespace Hotel.Pages
             }
         }
 
+        // Обработчик кнопки очистки фильтров и сортировки
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             SearchText.Clear();
@@ -208,6 +230,7 @@ namespace Hotel.Pages
             ApplyPagination();
         }
 
+        // Обработчик кнопки обновления статуса номеров
         private void UpdateStatusButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -222,6 +245,7 @@ namespace Hotel.Pages
             }
         }
 
+        // Обработчик клика на раздел "Клиенты"
         private void Clients_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             var clients = new AllClients(_name);
@@ -230,28 +254,32 @@ namespace Hotel.Pages
             _navigation.OpenAsDialog(clients);
         }
 
+        // Обработчик клика на раздел "Бронирования"
         private void Bookings_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-
+            var reservation = new MakeReservation();
+            reservation.Owner = this;
+            this.Hide();
+            reservation.ShowDialog();
         }
 
+        // Обработчик клика на раздел "Регистрация бронирования"
         private void RegistrateBooking_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            BookingNumberWindow bookingNumber = new BookingNumberWindow();
-            if(bookingNumber.ShowDialog() == true)
+            var bookingNumberWindow = new BookingNumberWindow();
+            if (bookingNumberWindow.ShowDialog() == true)
             {
-                var number = bookingNumber.BookingNumber;
-
+                var number = bookingNumberWindow.BookingNumber;
                 if (!string.IsNullOrEmpty(number))
                 {
                     var bookingData = _db.GetData("SELECT bookingID, room, bookingNumber, roomNumber, firstName, lastName, middleName, birthDate, phoneNumber, email " +
-                    "FROM Bookings " +
-                    "LEFT JOIN BookingClients ON BookingClients.booking = bookingID " +
-                    "LEFT JOIN Rooms ON room = roomID " +
-                    "LEFT JOIN Clients ON client=clientID " +
-                    $"WHERE bookingNumber='{number}';");
+                                                  "FROM Bookings " +
+                                                  "LEFT JOIN BookingClients ON BookingClients.booking = bookingID " +
+                                                  "LEFT JOIN Rooms ON room = roomID " +
+                                                  "LEFT JOIN Clients ON client=clientID " +
+                                                  $"WHERE bookingNumber='{number}';");
 
-                    ObservableCollection<BookingInfomation> bookingInfomations = new ObservableCollection<BookingInfomation>(
+                    var bookingInformationList = new ObservableCollection<BookingInfomation>(
                         from DataRow row in bookingData.Rows
                         select new BookingInfomation
                         {
@@ -267,9 +295,9 @@ namespace Hotel.Pages
                             RoomID = Convert.ToInt32(row["room"])
                         });
 
-                    WordDocumentManager wordManager = new WordDocumentManager();
+                    var wordManager = new WordDocumentManager();
 
-                    foreach (var booking in bookingInfomations)
+                    foreach (var booking in bookingInformationList)
                     {
                         var clientProfileData = new Dictionary<string, string>
                         {
@@ -281,16 +309,16 @@ namespace Hotel.Pages
                             { "Email", booking.ClientEmail },
                             { "RoomNumber", booking.RoomNumber }
                         };
+
                         string clientProfileTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory.Replace(@"\bin\Debug\", @"\Resources"), "ClientProfile.docx");
                         string clientProfileOutputPath = $"ClientProfile_{booking.ClientLastName}_{booking.ClientFirstName}.docx";
                         wordManager.FillTemplate(clientProfileTemplatePath, clientProfileOutputPath, clientProfileData);
 
                         string queryRoom = "UPDATE rooms SET isFree=@isFree WHERE roomID=@roomID;";
-
                         string connectionString = new ReadConfigFile().GetConnectionString();
-                        ConnectionInfo db = new ConnectionInfo(connectionString);
+                        var db = new ConnectionInfo(connectionString);
 
-                        MySqlParameter[] roomParameters = new MySqlParameter[]
+                        var roomParameters = new MySqlParameter[]
                         {
                             new MySqlParameter("@isFree", 'f'),
                             new MySqlParameter("@roomID", booking.RoomID)

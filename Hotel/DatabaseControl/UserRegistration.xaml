@@ -7,7 +7,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:controls="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/controls"
         mc:Ignorable="d"
-        Title="Создание нового пользователя" Height="337" Width="675"
+        Title="Информация о пользователе" Height="337" Width="690"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize" WindowStyle="ToolWindow"
         FontSize="13" FontFamily="Montserrat"
@@ -100,6 +100,7 @@
         </Border>
 
         <TextBlock Grid.Row="0" Grid.Column="1"
+                   Name="TitleForm"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    FontSize="28" FontWeight="Regular"

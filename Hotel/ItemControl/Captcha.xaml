@@ -59,7 +59,7 @@
                         x:Name="CheckCapthaButton"
                         Margin="10 0" Content="ПРОВЕРИТЬ"
                         Background="#5C6BC0"
-                        Click="CheckCapthaButton_Click"/>
+                        Click="CheckCaptchaButton_Click"/>
             </Grid>
         </materialDesign:Card>
     </Grid>

@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Hotel.Classes;
+using MySql.Data.MySqlClient;
+using System;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
-
-using MySql.Data.MySqlClient;
-
-using Hotel.Classes;
 
 namespace Hotel.DatabaseControl.TabControl
 {
@@ -18,7 +16,7 @@ namespace Hotel.DatabaseControl.TabControl
         private readonly ConnectionInfo _db; // Объект для работы с базой данных
         private readonly Navigation _navigation = new Navigation(); // Объект для навигации (не используется)
 
-        private DataTable _bookings; // Таблица с бронированиями
+        private DataTable _bookings = new DataTable(); // Таблица с бронированиями
         private DataTable _bookingsOriginal; // Исходная таблица бронирований
 
         // Конструктор класса
@@ -39,25 +37,33 @@ namespace Hotel.DatabaseControl.TabControl
         // Метод для загрузки данных из базы данных
         private void LoadData()
         {
-            const string query = "SELECT bookingID, bookingClientsID, bookingNumber, " +
-                "client, lastName, firstName, phoneNumber, passport, birthCertificate, " +
-                "DATE_FORMAT(arrivalDate, '%d.%m.%Y') as arrivalDate, DATE_FORMAT(departureDate, '%d.%m.%Y') as departureDate, " +
-                "room, roomNumber, " +
-                "meal, mealName, quantity, mealCost, " +
-                "amount FROM BookingClients " +
-                "LEFT JOIN Bookings ON BookingClients.booking = bookingID " +
-                "LEFT JOIN BookingMeals ON BookingClients.booking = BookingMeals.booking " +
-                "LEFT JOIN Meals ON meal = mealID LEFT JOIN Rooms ON room = roomID " +
-                "LEFT JOIN Clients ON client = clientID " +
-                "ORDER BY bookingNumber;";
-
-            _bookings = _db.GetData(query);
-
-            if (_bookings != null)
+            _bookings.Clear();
+            try
             {
-                _bookingsOriginal = _bookings.Copy();
-                Bookings.ItemsSource = _bookings.DefaultView;
-                ConfigureDataGrid();
+                const string query = "SELECT bookingID, bookingClientsID, bookingNumber, " +
+                    "client, lastName, firstName, phoneNumber, passport, birthCertificate, " +
+                    "DATE_FORMAT(arrivalDate, '%d.%m.%Y') as arrivalDate, DATE_FORMAT(departureDate, '%d.%m.%Y') as departureDate, " +
+                    "room, roomNumber, " +
+                    "meal, mealName, quantity, mealCost, " +
+                    "amount FROM BookingClients " +
+                    "LEFT JOIN Bookings ON BookingClients.booking = bookingID " +
+                    "LEFT JOIN BookingMeals ON BookingClients.booking = BookingMeals.booking " +
+                    "LEFT JOIN Meals ON meal = mealID LEFT JOIN Rooms ON room = roomID " +
+                    "LEFT JOIN Clients ON client = clientID " +
+                    "ORDER BY bookingNumber;";
+
+                _bookings = _db.GetData(query);
+
+                if (_bookings != null)
+                {
+                    _bookingsOriginal = _bookings.Copy();
+                    Bookings.ItemsSource = _bookings.DefaultView;
+                    ConfigureDataGrid();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке данных: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -99,47 +105,54 @@ namespace Hotel.DatabaseControl.TabControl
         // Метод для поиска в таблице бронирований
         private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var searchText = SearchText.Text.ToLower();
-
-            if (string.IsNullOrEmpty(searchText))
+            try
             {
-                // Восстановление исходной таблицы, если строка поиска пуста
-                Bookings.ItemsSource = _bookingsOriginal.DefaultView;
-                ConfigureDataGrid();
-                return;
-            }
+                var searchText = SearchText.Text.ToLower();
 
-            var dv = new DataView(_bookingsOriginal)
-            {
-                RowFilter = $"bookingNumber LIKE '%{searchText}%'"
-            };
-
-            var newTable = _bookingsOriginal.Clone(); // Клонирование структуры исходной таблицы
-
-            // Добавление отфильтрованных строк в новую таблицу
-            foreach (DataRowView row in dv)
-            {
-                newTable.ImportRow(row.Row);
-            }
-
-            // Добавление оставшихся строк
-            foreach (DataRow row in _bookingsOriginal.Rows)
-            {
-                var name = row["bookingNumber"].ToString().ToLower();
-
-                if (!name.Contains(searchText))
+                if (string.IsNullOrEmpty(searchText))
                 {
-                    newTable.ImportRow(row);
+                    // Восстановление исходной таблицы, если строка поиска пуста
+                    Bookings.ItemsSource = _bookingsOriginal.DefaultView;
+                    ConfigureDataGrid();
+                    return;
+                }
+
+                var dv = new DataView(_bookingsOriginal)
+                {
+                    RowFilter = $"bookingNumber LIKE '%{searchText}%'"
+                };
+
+                var newTable = _bookingsOriginal.Clone(); // Клонирование структуры исходной таблицы
+
+                // Добавление отфильтрованных строк в новую таблицу
+                foreach (DataRowView row in dv)
+                {
+                    newTable.ImportRow(row.Row);
+                }
+
+                // Добавление оставшихся строк
+                foreach (DataRow row in _bookingsOriginal.Rows)
+                {
+                    var name = row["bookingNumber"].ToString().ToLower();
+
+                    if (!name.Contains(searchText))
+                    {
+                        newTable.ImportRow(row);
+                    }
+                }
+
+                Bookings.ItemsSource = newTable.DefaultView;
+                ConfigureDataGrid();
+
+                if (newTable.Rows.Count > 0)
+                {
+                    Bookings.SelectedIndex = 0;
+                    Bookings.ScrollIntoView(Bookings.SelectedItem);
                 }
             }
-
-            Bookings.ItemsSource = newTable.DefaultView;
-            ConfigureDataGrid();
-
-            if (newTable.Rows.Count > 0)
+            catch (Exception ex)
             {
-                Bookings.SelectedIndex = 0;
-                Bookings.ScrollIntoView(Bookings.SelectedItem);
+                MessageBox.Show($"Ошибка при поиске: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -154,7 +167,6 @@ namespace Hotel.DatabaseControl.TabControl
                 if (MessageBox.Show($"Вы уверены, что хотите удалить запись {bookingNumber}?", "УДАЛЕНИЕ", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     DeleteBooking(bookingId);
-                    LoadData();
                 }
             }
         }
@@ -215,14 +227,21 @@ namespace Hotel.DatabaseControl.TabControl
         // Метод для редактирования бронирования
         private void EditBookingButton_Click(object sender, RoutedEventArgs e)
         {
-            if (Bookings.SelectedItem is DataRowView selectedRow)
+            try
             {
-                var bookingId = Convert.ToInt32(selectedRow["bookingID"]);
-
-                if (new BookingEdit(bookingId).ShowDialog() == true)
+                if (Bookings.SelectedItem is DataRowView selectedRow)
                 {
-                    LoadData();
+                    var bookingId = Convert.ToInt32(selectedRow["bookingID"]);
+
+                    if (new BookingEdit(bookingId).ShowDialog() == true)
+                    {
+                        LoadData();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при редактировании бронирования: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

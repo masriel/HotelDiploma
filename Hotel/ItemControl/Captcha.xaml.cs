@@ -1,31 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Brushes = System.Windows.Media.Brushes;
 
 namespace Hotel.ItemControl
 {
     /// <summary>
-    /// Interaction logic for Captcha.xaml
+    /// Логика взаимодействия для Captcha.xaml
     /// </summary>
     public partial class Captcha : Window
     {
         private Random RANDOM = new Random();
+        private string CAPTCHA_TEXT = string.Empty;
 
-        private string CAPTCHA_TEXT = String.Empty;
         public Captcha()
         {
             InitializeComponent();
@@ -36,19 +23,20 @@ namespace Hotel.ItemControl
             GenerateCaptcha();
         }
 
+        // Метод для генерации капчи
         private void GenerateCaptcha()
         {
-            CAPTCHA_TEXT = GenerateRandomText(5);
+            CAPTCHA_TEXT = GenerateRandomText(5); // Генерация случайного текста для капчи
             DrawingVisual drawingVisual = new DrawingVisual();
             int width = 165;
             int height = 100;
 
             using (DrawingContext drawingContext = drawingVisual.RenderOpen())
             {
-                // Background
+                // Фон капчи
                 drawingContext.DrawRectangle(Brushes.White, null, new Rect(0, 0, width, height));
 
-                // Create text
+                // Создание текста капчи
                 FormattedText formattedText = new FormattedText(
                     CAPTCHA_TEXT,
                     System.Globalization.CultureInfo.InvariantCulture,
@@ -59,7 +47,7 @@ namespace Hotel.ItemControl
                     new NumberSubstitution(),
                     1);
 
-                // Randomize text position
+                // Случайное расположение текста на картинке
                 double maxX = width - formattedText.Width;
                 double maxY = height - formattedText.Height;
                 double posX = RANDOM.NextDouble() * maxX;
@@ -67,7 +55,7 @@ namespace Hotel.ItemControl
 
                 drawingContext.DrawText(formattedText, new System.Windows.Point(posX, posY));
 
-                // Add random lines
+                // Добавление случайных линий для сложности капчи
                 for (int i = 0; i < 10; i++)
                 {
                     drawingContext.DrawLine(
@@ -76,7 +64,7 @@ namespace Hotel.ItemControl
                         new System.Windows.Point(RANDOM.Next(width), RANDOM.Next(height)));
                 }
 
-                // Add noise
+                // Добавление случайных точек для шума
                 for (int i = 0; i < 100; i++)
                 {
                     drawingContext.DrawEllipse(
@@ -88,11 +76,13 @@ namespace Hotel.ItemControl
                 }
             }
 
+            // Создание изображения капчи
             RenderTargetBitmap bmp = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
             bmp.Render(drawingVisual);
             CaptchaPic.Source = bmp;
         }
 
+        // Метод для генерации случайного текста
         private string GenerateRandomText(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -106,29 +96,32 @@ namespace Hotel.ItemControl
             return new string(stringChars);
         }
 
+        // Обработчик кнопки обновления капчи
         private void RefreshCaptchaButton_Click(object sender, RoutedEventArgs e)
         {
             GenerateCaptcha();
         }
 
-        private void CheckCapthaButton_Click(object sender, RoutedEventArgs e)
+        // Обработчик кнопки проверки капчи
+        private void CheckCaptchaButton_Click(object sender, RoutedEventArgs e)
         {
-            string InputText = CaptchaText.Text;
-            if (InputText.Trim() == "")
+            string inputText = CaptchaText.Text;
+            if (string.IsNullOrWhiteSpace(inputText))
             {
                 MessageBox.Show("Введите текст с картинки!", "ПРОВЕРКА", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            if(InputText.Trim() == CAPTCHA_TEXT.Trim())
+            if (inputText.Trim() == CAPTCHA_TEXT.Trim())
             {
                 this.Close();
-                return;
             }
-
-            MessageBox.Show("Ошибка ввода капчи!", "ПРОВЕРКА", MessageBoxButton.OK, MessageBoxImage.Error);
-            CaptchaText.Text = string.Empty;
-            GenerateCaptcha();
+            else
+            {
+                MessageBox.Show("Ошибка ввода капчи!", "ПРОВЕРКА", MessageBoxButton.OK, MessageBoxImage.Error);
+                CaptchaText.Text = string.Empty;
+                GenerateCaptcha();
+            }
         }
     }
 }

@@ -1,8 +1,5 @@
-﻿using System;
+﻿using Hotel.Classes;
 using System.Windows;
-
-using Hotel.Classes;
-using Hotel.Pages;
 
 namespace Hotel.Pages
 {

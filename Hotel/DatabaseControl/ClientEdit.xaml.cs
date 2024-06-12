@@ -1,9 +1,7 @@
-﻿using System;
-using System.Windows;
-
+﻿using Hotel.Classes;
 using MySql.Data.MySqlClient;
-
-using Hotel.Classes;
+using System;
+using System.Windows;
 
 namespace Hotel.DatabaseControl
 {
@@ -19,7 +17,6 @@ namespace Hotel.DatabaseControl
         public ClientEdit(int id, string firstName, string lastName, string middleName, string birthDate, string phone, string email, int passport, int bc)
         {
             InitializeComponent();
-
             _connectionString = _config.GetConnectionString();
             _db = new ConnectionInfo(_connectionString);
 
@@ -70,18 +67,32 @@ namespace Hotel.DatabaseControl
 
         private void GetPassport(int id)
         {
-            var passport = _db.GetData($"SELECT passportSeries, passportNumber, DATE_FORMAT(issueDate, '%Y-%m-%d') as issueDate, issuingAuthority FROM ClientPassports WHERE passportID = {id};").Rows[0];
-            SeriesNumber.Text = $"{passport["passportSeries"]} {passport["passportNumber"]}";
-            IssueDate.Text = DateTime.Parse(Convert.ToString(passport["issueDate"])).ToString("dd.MM.yyyy");
-            IssuingAuthority.Text = passport["issuingAuthority"].ToString();
+            try
+            {
+                var passport = _db.GetData($"SELECT passportSeries, passportNumber, DATE_FORMAT(issueDate, '%Y-%m-%d') as issueDate, issuingAuthority FROM ClientPassports WHERE passportID = {id};").Rows[0];
+                SeriesNumber.Text = $"{passport["passportSeries"]} {passport["passportNumber"]}";
+                IssueDate.Text = DateTime.Parse(Convert.ToString(passport["issueDate"])).ToString("dd.MM.yyyy");
+                IssuingAuthority.Text = passport["issuingAuthority"].ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки данных паспорта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void GetBirthCertificate(int id)
         {
-            var bc = _db.GetData($"SELECT registrationNumber, DATE_FORMAT(issueDate, '%Y-%m-%d') as issueDate, issuingAuthority FROM BirthCertificate WHERE birthCertificateID = {id};").Rows[0];
-            RegNumber.Text = bc["registrationNumber"].ToString();
-            BirthCertificateIssueDate.Text = DateTime.Parse(Convert.ToString(bc["issueDate"])).ToString("dd.MM.yyyy");
-            BirthCertificateIssuingAuthority.Text = bc["issuingAuthority"].ToString();
+            try
+            {
+                var bc = _db.GetData($"SELECT registrationNumber, DATE_FORMAT(issueDate, '%Y-%m-%d') as issueDate, issuingAuthority FROM BirthCertificate WHERE birthCertificateID = {id};").Rows[0];
+                RegNumber.Text = bc["registrationNumber"].ToString();
+                BirthCertificateIssueDate.Text = DateTime.Parse(Convert.ToString(bc["issueDate"])).ToString("dd.MM.yyyy");
+                BirthCertificateIssuingAuthority.Text = bc["issuingAuthority"].ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки данных свидетельства о рождении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void EditClient()
@@ -99,13 +110,20 @@ namespace Hotel.DatabaseControl
                 return;
             }
 
-            if (_passportExist != 0)
+            try
             {
-                UpdateClientAndPassport();
+                if (_passportExist != 0)
+                {
+                    UpdateClientAndPassport();
+                }
+                else if (_bcExist != 0)
+                {
+                    UpdateClientAndBirthCertificate();
+                }
             }
-            else if (_bcExist != 0)
+            catch (Exception ex)
             {
-                UpdateClientAndBirthCertificate();
+                MessageBox.Show($"Ошибка обновления данных: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -145,7 +163,8 @@ namespace Hotel.DatabaseControl
             string query = "UPDATE Clients SET firstName = @FirstName, lastName = @LastName, middleName = @MiddleName, birthDate = @BirthDate, phoneNumber = @PhoneNumber, email = @Email WHERE clientID = @ClientID";
             var parameters = new[]
             {
-                new MySqlParameter("@FirstName", _firstName),
+                new MySqlParameter
+                                ("@FirstName", _firstName),
                 new MySqlParameter("@LastName", _lastName),
                 new MySqlParameter("@MiddleName", _middleName),
                 new MySqlParameter("@BirthDate", DateTime.Parse(_birthDate).ToString("yyyy-MM-dd")),

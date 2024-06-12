@@ -7,7 +7,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:Hotel.DatabaseControl"
         mc:Ignorable="d"
-        Title="Информация о комнате" Height="370" Width="780"
+        Title="Информация о комнате" Height="380" Width="780"
         WindowStartupLocation="Manual"
         ResizeMode="NoResize" WindowStyle="ToolWindow"
         FontSize="21" FontFamily="Montserrat" 
@@ -31,7 +31,8 @@
                        x:Name="PhotoRoom"
                        Margin="5"
                        VerticalAlignment="Center"
-                       HorizontalAlignment="Center"/>
+                       HorizontalAlignment="Center"
+                       PreviewMouseLeftButtonUp="PhotoRoom_PreviewMouseLeftButtonUp"/>
 
                 <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                          x:Name="TypeRoom"
@@ -48,8 +49,7 @@
                                     Margin="5">
                             <TextBox x:Name="DescriptionRoom"
                                      TextWrapping="Wrap"
-                                     FontSize="18"
-                                     Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."
+                                     FontSize="16"
                                      Style="{StaticResource MaterialDesignTextBox}"/>
 
                             <StackPanel Orientation="Horizontal"

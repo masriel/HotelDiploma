@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Hotel.Classes;
+using Hotel.ItemControl;
+using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
-using MySql.Data.MySqlClient;
-using Hotel.Classes;
-using Hotel.ItemControl;
 
 namespace Hotel.DatabaseControl
 {
@@ -154,11 +154,19 @@ namespace Hotel.DatabaseControl
 
         private void MealsList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (MealsList.SelectedItem is ListBoxItem selectedItem)
+            try
             {
-                Meals selectedMeal = (Meals)selectedItem.Tag;
-                _meals.Remove(selectedMeal);
-                MealsList.Items.Remove(selectedItem);
+                if (MealsList.SelectedItem != null)
+                {
+                    int selectedIndex = MealsList.SelectedIndex;
+                    var selectedMeal = (Meals)((ListBoxItem)MealsList.SelectedItem).Tag;
+                    _meals.Remove(selectedMeal);
+                    MealsList.Items.RemoveAt(selectedIndex);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при удалении питания: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

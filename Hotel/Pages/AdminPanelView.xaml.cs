@@ -1,10 +1,8 @@
-﻿using System;
+﻿using Hotel.AdminPanel;
+using Hotel.Classes;
+using Hotel.DatabaseControl;
 using System.Windows;
 using System.Windows.Input;
-
-using Hotel.DatabaseControl;
-using Hotel.AdminPanel;
-using Hotel.Classes;
 
 namespace Hotel.Pages
 {
@@ -22,16 +20,25 @@ namespace Hotel.Pages
             InitializeComponent();
             PASSWORD = pwd;
             NAME = name;
+
+            App.Current.Exit += Current_Exit; // Подписываемся на событие закрытия приложения
+        }
+
+        private void Current_Exit(object sender, ExitEventArgs e)
+        {
+            BackupDatabase exit = new BackupDatabase();
+            // Создаем резервную копию базы данных при закрытии приложения
+            exit.CreateExitBackup();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            if(MessageBox.Show("Закрыть приложение?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) this.Close();
+            if (MessageBox.Show("Закрыть приложение?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) this.Close();
         }
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-            if(MessageBox.Show("Выйти из системы?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) NAVIGATION.OpenAsNewPage(new Login(), this);
+            if (MessageBox.Show("Выйти из системы?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) NAVIGATION.OpenAsNewPage(new Login(), this);
         }
 
         private void Users_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

@@ -1,35 +1,31 @@
-﻿using System;
+﻿using Hotel.Classes;
+using Hotel.ItemControl;
+using MySql.Data.MySqlClient;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-using MySql.Data.MySqlClient;
-using Hotel.Classes;
-using Hotel.ItemControl;
-
 namespace Hotel.Pages
 {
     /// <summary>
-    /// Interaction logic for Login.xaml
+    /// Логика взаимодействия для Login.xaml
     /// </summary>
     public partial class Login : Window
     {
         private ReadConfigFile _config = new ReadConfigFile();
-
-        private string CONNECTION_STRING = String.Empty;
+        private string CONNECTION_STRING = string.Empty;
         private MySqlConnection CONNECTION;
         private MySqlCommand COMMAND;
-
         private Navigation NAVIGATION = new Navigation();
         private HashPassword Security = new HashPassword();
-
         private int TRY_COUNT;
 
         public Login()
         {
             InitializeComponent();
-            CONNECTION_STRING = _config.GetConnectionString();  //получение строки подключения
+            CONNECTION_STRING = _config.GetConnectionString();  // Получение строки подключения
         }
 
         private void ShowPwdButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -45,119 +41,112 @@ namespace Hotel.Pages
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Закрыть приложение?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) this.Close();
+            if (MessageBox.Show("Закрыть приложение?", "ВЫХОД", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                this.Close();
         }
 
-        //показать/скрыть пароль
+        // Показать/скрыть пароль
         private void ChangeVisibility(PasswordBox pwd, TextBox text, bool isShow)
         {
             if (isShow)
             {
                 pwd.Visibility = Visibility.Collapsed;
                 text.Visibility = Visibility.Visible;
-                return;
             }
-            text.Visibility = Visibility.Collapsed;
-            pwd.Visibility = Visibility.Visible;
+            else
+            {
+                text.Visibility = Visibility.Collapsed;
+                pwd.Visibility = Visibility.Visible;
+            }
         }
 
-        //авторизация
+        // Авторизация
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            //string USERNAME = LoginText.Text, PASSWORD = Security.HashPasswd(PasswordText.Password);
+            string USERNAME = LoginText.Text, PASSWORD = Security.HashPasswd(PasswordText.Password);
 
-            //if (!CheckFields(USERNAME, PASSWORD))
-            //{
-            //    MessageBox.Show("Все поля должны быть заполнены!", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
-            //    return;
-            //}
+            if (!CheckFields(USERNAME, PASSWORD))
+            {
+                MessageBox.Show("Все поля должны быть заполнены!", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
-            //if (TRY_COUNT <= 0) NAVIGATION.OpenAsDialog(new Captcha());
+            if (TRY_COUNT <= 0)
+                NAVIGATION.OpenAsDialog(new Captcha());
 
-            //try
-            //{
-            //    using (CONNECTION = new MySqlConnection(CONNECTION_STRING))
-            //    {
-            //        CONNECTION.Open();
+            try
+            {
+                using (CONNECTION = new MySqlConnection(CONNECTION_STRING))
+                {
+                    CONNECTION.Open();
 
-            //        //проверка существует ли пользователь
-            //        string checkUserQuery = $"select count(*) from users where userEmail='{USERNAME}';";
-            //        COMMAND = new MySqlCommand(checkUserQuery, CONNECTION);
-            //        int userCount = Convert.ToInt32(COMMAND.ExecuteScalar());
-            //        if (userCount == 0)
-            //        {
-            //            MessageBox.Show("Пользователь не существует.", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
-            //            return;
-            //        }
+                    // Проверка существует ли пользователь
+                    string checkUserQuery = $"SELECT COUNT(*) FROM users WHERE userEmail='{USERNAME}';";
+                    COMMAND = new MySqlCommand(checkUserQuery, CONNECTION);
+                    int userCount = Convert.ToInt32(COMMAND.ExecuteScalar());
+                    if (userCount == 0)
+                    {
+                        MessageBox.Show("Пользователь не существует.", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
 
-            //        //проверка на правильность ввода
-            //        string checkLoginQuery = $"select count(*) from users where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
-            //        COMMAND = new MySqlCommand(checkLoginQuery, CONNECTION);
-            //        int loginCount = Convert.ToInt32(COMMAND.ExecuteScalar());
-            //        if (loginCount == 0)
-            //        {
-            //            MessageBox.Show("Неправильный логин или пароль.", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
-            //            TRY_COUNT--;
+                    // Проверка на правильность ввода
+                    string checkLoginQuery = $"SELECT COUNT(*) FROM users WHERE userEmail='{USERNAME}' AND userPassword='{PASSWORD}';";
+                    COMMAND = new MySqlCommand(checkLoginQuery, CONNECTION);
+                    int loginCount = Convert.ToInt32(COMMAND.ExecuteScalar());
+                    if (loginCount == 0)
+                    {
+                        MessageBox.Show("Неправильный логин или пароль.", "АВТОРИЗАЦИЯ", MessageBoxButton.OK, MessageBoxImage.Error);
+                        TRY_COUNT--;
 
-            //            if (TRY_COUNT == 0)
-            //            {
-            //                _ = BlockInputFieldsForDurationAsync(10000);
-            //            }
+                        if (TRY_COUNT == 0)
+                        {
+                            _ = BlockInputFieldsForDurationAsync(10000);
+                        }
 
-            //            return;
-            //        }
+                        return;
+                    }
 
-            //        //получение имени пользователя
-            //        string getUserName = $"select userName from users  where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
-            //        COMMAND = new MySqlCommand(getUserName, CONNECTION);
-            //        object resultBack = COMMAND.ExecuteScalar();
-            //        string name = String.Empty;
-            //        if (resultBack != null)
-            //        {
-            //            name = Convert.ToString(resultBack);
-            //        }
+                    // Получение имени пользователя
+                    string getUserName = $"SELECT userName FROM users WHERE userEmail='{USERNAME}' AND userPassword='{PASSWORD}';";
+                    COMMAND = new MySqlCommand(getUserName, CONNECTION);
+                    object resultBack = COMMAND.ExecuteScalar();
+                    string name = resultBack?.ToString() ?? string.Empty;
 
-            //        //определение типа пользователя
-            //        string getUserType = $"select userType from users  where userEmail='{USERNAME}' and userPassword='{PASSWORD}';";
-            //        int userType = 0;
-            //        COMMAND = new MySqlCommand(getUserType, CONNECTION);
-            //        resultBack = COMMAND.ExecuteScalar();
-            //        if (resultBack != null)
-            //        {
-            //            userType = Convert.ToInt32(resultBack);
-            //        }
+                    // Определение типа пользователя
+                    string getUserType = $"SELECT userType FROM users WHERE userEmail='{USERNAME}' AND userPassword='{PASSWORD}';";
+                    COMMAND = new MySqlCommand(getUserType, CONNECTION);
+                    resultBack = COMMAND.ExecuteScalar();
+                    int userType = resultBack != null ? Convert.ToInt32(resultBack) : 0;
 
-            //        //авторизация
-            //        if (userType == 1) NAVIGATION.OpenAsNewPage(new AdminPanelView(name, PASSWORD), this);
-            //        else NAVIGATION.OpenAsNewPage(new MainView(), this);
-
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
-            //}
-
-            //NAVIGATION.OpenAsNewPage(new AdminPanelView("Екатерина Мухина", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"), this);
-            NAVIGATION.OpenAsNewPage(new MainView("Екатерина Мухина"), this);
+                    // Авторизация
+                    if (userType == 1)
+                        NAVIGATION.OpenAsNewPage(new AdminPanelView(name, PASSWORD), this);
+                    else
+                        NAVIGATION.OpenAsNewPage(new MainView(name), this);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        //проверка на пустые поля
+        // Проверка на пустые поля
         private bool CheckFields(string username, string password)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) return false;
-
-            return true;
+            return !(string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password));
         }
 
         private void LoginWin_Loaded(object sender, RoutedEventArgs e)
         {
-            TRY_COUNT = 3;
+            TRY_COUNT = 3;  // Установка начального значения попыток входа
         }
 
+        // Блокировка ввода на определенное время
         private async Task BlockInputFieldsForDurationAsync(int milliseconds)
         {
-            PasswordText.Password = String.Empty;
+            PasswordText.Password = string.Empty;
             InputGrid.IsEnabled = false;
             TimerText.Visibility = Visibility.Visible;
 
@@ -165,13 +154,7 @@ namespace Hotel.Pages
 
             for (int i = 0; i < seconds; i++)
             {
-                if (i == 0)
-                {
-                    SecondsText.Text = $"{seconds - i}";
-                    await Task.Delay(1000);
-                    continue;
-                }
-                SecondsText.Text = $"0{seconds - i}";
+                SecondsText.Text = $"{seconds - i}";
                 await Task.Delay(1000);
             }
 

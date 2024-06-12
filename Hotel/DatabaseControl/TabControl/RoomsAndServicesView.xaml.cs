@@ -1,9 +1,9 @@
 ﻿using Hotel.Classes;
+using MySql.Data.MySqlClient;
 using System;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
-using MySql.Data.MySqlClient;
 
 namespace Hotel.DatabaseControl.TabControl
 {
@@ -167,7 +167,7 @@ namespace Hotel.DatabaseControl.TabControl
                 if (roomId > 0)
                 {
                     var isFree = Convert.ToString(selectedRow["isFree"]);
-                    var newStatus = isFree=="t" ? "f" : "t"; // Изменение статуса на противоположный
+                    var newStatus = isFree == "t" ? "f" : "t"; // Изменение статуса на противоположный
                     try
                     {
                         const string query = "UPDATE Rooms SET isFree = @IsFree WHERE roomID = @RoomID";
@@ -209,10 +209,11 @@ namespace Hotel.DatabaseControl.TabControl
                     var occupancy = Convert.ToString(selectedRow["maxOccupancy"]);
                     var description = Convert.ToString(selectedRow["roomDescription"]);
                     var cost = Convert.ToString(selectedRow["roomCost"]);
+                    var photo = Convert.ToString(selectedRow["roomPhoto"]);
 
                     if (MessageBox.Show("Вы обновите информацию всех номеров данного вида!", "ОБРАТИТЕ ВНИМАНИЕ", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                     {
-                        if (new RoomEdit(typeId, type, occupancy, description, cost).ShowDialog() == true)
+                        if (new RoomEdit(typeId, type, occupancy, description, cost, photo).ShowDialog() == true)
                         {
                             LoadData();
                         }

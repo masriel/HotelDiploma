@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Hotel.Classes;
+using MySql.Data.MySqlClient;
+using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Hotel.Classes;
-using MySql.Data.MySqlClient;
 
 namespace Hotel.Pages
 {
@@ -20,56 +20,84 @@ namespace Hotel.Pages
         // Обработка изменения даты рождения
         private void BirthDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            DateTime today = DateTime.Today;
-            DateTime selectDate = DateTime.Parse(Convert.ToString(BirthDate.SelectedDate));
-            int age = today.Year - selectDate.Year;
+            try
+            {
+                DateTime today = DateTime.Today;
+                DateTime selectDate = DateTime.Parse(Convert.ToString(BirthDate.SelectedDate));
+                int age = today.Year - selectDate.Year;
 
-            if (today < selectDate.AddYears(age))
-            {
-                age--;
-            }
+                if (today < selectDate.AddYears(age))
+                {
+                    age--;
+                }
 
-            // Показать соответствующие поля в зависимости от возраста
-            if (age < 14)
-            {
-                PassportView.Visibility = Visibility.Collapsed;
-                BirthCertificateView.Visibility = Visibility.Visible;
+                // Показать соответствующие поля в зависимости от возраста
+                if (age < 14)
+                {
+                    PassportView.Visibility = Visibility.Collapsed;
+                    BirthCertificateView.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    PassportView.Visibility = Visibility.Visible;
+                    BirthCertificateView.Visibility = Visibility.Collapsed;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                PassportView.Visibility = Visibility.Visible;
-                BirthCertificateView.Visibility = Visibility.Collapsed;
+                MessageBox.Show($"Ошибка при обработке даты рождения: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         // Валидация ввода для поля Email
         private void Email_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            Regex regex = new Regex("^[a-zA-Z0-9@\\-_.]+$");
-            e.Handled = !regex.IsMatch(e.Text);
+            try
+            {
+                Regex regex = new Regex("^[a-zA-Z0-9@\\-_.]+$");
+                e.Handled = !regex.IsMatch(e.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при валидации Email: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         // Валидация ввода для текстовых полей
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            Regex regex = new Regex("^[а-яА-ЯёЁ]+$");
-            e.Handled = !regex.IsMatch(e.Text);
+            try
+            {
+                Regex regex = new Regex("^[а-яА-ЯёЁ]+$");
+                e.Handled = !regex.IsMatch(e.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при валидации текстового поля: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         // Автоматическое преобразование первой буквы в верхний регистр
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBox textBox = sender as TextBox;
-            if (textBox == null) return;
-
-            int caretIndex = textBox.CaretIndex;
-
-            if (!string.IsNullOrEmpty(textBox.Text))
+            try
             {
-                string text = textBox.Text;
-                textBox.Text = char.ToUpper(text[0]) + text.Substring(1);
+                TextBox textBox = sender as TextBox;
+                if (textBox == null) return;
 
-                textBox.CaretIndex = caretIndex;
+                int caretIndex = textBox.CaretIndex;
+
+                if (!string.IsNullOrEmpty(textBox.Text))
+                {
+                    string text = textBox.Text;
+                    textBox.Text = char.ToUpper(text[0]) + text.Substring(1);
+
+                    textBox.CaretIndex = caretIndex;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при автоматическом преобразовании текста: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -85,8 +113,7 @@ namespace Hotel.Pages
 
             // Проверка на заполненность всех полей
             if (string.IsNullOrWhiteSpace(_lastName) || string.IsNullOrWhiteSpace(_firstName) ||
-                string.IsNullOrWhiteSpace(_middleName) || string.IsNullOrWhiteSpace(_email) ||
-                string.IsNullOrWhiteSpace(_phone) || BirthDate.SelectedDate == null)
+                string.IsNullOrWhiteSpace(_middleName) || string.IsNullOrWhiteSpace(_phone) || BirthDate.SelectedDate == null)
             {
                 MessageBox.Show("Пожалуйста, заполните все поля.", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -152,7 +179,7 @@ namespace Hotel.Pages
 
                 // Вставка данных клиента
                 string queryClient = "INSERT INTO Clients (lastName, firstName, middleName, birthDate, phoneNumber, email, passport, birthCertificate) " +
-                                     "VALUES (@LastName, @FirstName, @MiddleName, @BirthDate, @PhoneNumber, @Email, @PassportID, @BirthCertificateID);";
+                                     "VALUES (@LastName, @FirstName, @MiddleName, @BirthDate, @PhoneNumber, @Email, @PassportID, @BirthCertificateID); SELECT LAST_INSERT_ID();";
 
                 MySqlParameter[] clientParameters = new MySqlParameter[]
                 {
@@ -190,9 +217,17 @@ namespace Hotel.Pages
             }
         }
 
+        // Обработка события закрытия окна
         private void AddClientWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            DialogResult = false;
+            try
+            {
+                DialogResult = DialogResult == true ? true : false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при закрытии окна: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

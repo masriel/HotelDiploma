@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Windows;
-
-using Hotel.Classes;
+﻿using Hotel.Classes;
 using Hotel.Pages;
+using System;
+using System.Windows;
 
 namespace Hotel
 {

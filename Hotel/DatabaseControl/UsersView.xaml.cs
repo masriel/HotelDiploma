@@ -1,12 +1,12 @@
 ﻿using Hotel.Classes;
+using Hotel.Pages;
+using MySql.Data.MySqlClient;
 using System;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using MySql.Data.MySqlClient;
-using Hotel.Pages;
 
 namespace Hotel.DatabaseControl
 {
@@ -200,6 +200,8 @@ namespace Hotel.DatabaseControl
                     {
                         NAVIGATION.OpenAsDialog(new UserRegistration(userId, name, login, type, true));
                     }
+
+                    LoadData();
                 }
             }
         }

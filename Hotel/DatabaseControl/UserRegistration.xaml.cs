@@ -1,19 +1,9 @@
 ﻿using Hotel.Classes;
 using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Hotel.DatabaseControl
 {
@@ -193,6 +183,7 @@ namespace Hotel.DatabaseControl
             EmailText.Text = LOGIN;
             UserRole.SelectedIndex = TYPE != 0 ? TYPE - 1 : -1;
             AddUserButton.Content = IsEdit ? "РЕДАКТИРОВАТЬ" : "ДОБАВИТЬ";
+            TitleForm.Text = IsEdit ? "РЕДАКТИРОВАНИЕ" : "СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ";
         }
 
         private void EditUser(int id, string name, string login, string password, int role)

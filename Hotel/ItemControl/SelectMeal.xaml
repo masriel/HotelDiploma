@@ -5,15 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hotel.ItemControl"
         mc:Ignorable="d"
-        Title="Выберите питание" Height="150" Width="180"
+        Title="Выберите питание" Height="150" Width="250"
         WindowStartupLocation="CenterScreen" Background="#E8EAF6"
-        ResizeMode="NoResize" WindowStyle="None"
+        ResizeMode="NoResize" WindowStyle="ToolWindow"
         FontSize="18" FontFamily="Montserrat" 
         Foreground="#5C6BC0" FontWeight="Medium">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition Height=".3*"/>
+            <RowDefinition Height=".4*"/>
         </Grid.RowDefinitions>
         
         <Grid.ColumnDefinitions>

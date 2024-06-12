@@ -8,6 +8,7 @@
         mc:Ignorable="d"
         Title="Выберите таблицу" Height="300" Width="530"
         ResizeMode="NoResize" WindowStyle="ToolWindow"
+        WindowStartupLocation="CenterScreen"
         FontSize="14" FontFamily="Montserrat">
 
     <Window.Resources>

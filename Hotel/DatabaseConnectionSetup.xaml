@@ -47,15 +47,15 @@
                            Style="{StaticResource MaterialDesignTitleTextBlock}"/>
 
                 <TextBox Grid.Row="1" Grid.Column="0"
-                         x:Name="HostnameText" Text="localhost"
+                         x:Name="HostnameText"
                          materialDesign:HintAssist.Hint="Server"/>
 
                 <TextBox Grid.Row="1" Grid.Column="1"
-                         x:Name="PortText" Text="3306"
+                         x:Name="PortText"
                          materialDesign:HintAssist.Hint="Port"/>
 
                 <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                         x:Name="UsernameText" Text="root"
+                         x:Name="UsernameText"
                          materialDesign:HintAssist.Hint="Username"/>
 
                 <PasswordBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
