@@ -156,10 +156,10 @@
       <DependentUpon>ControlDatabaseView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\BackupDatabase.cs" />
+    <Compile Include="Classes\BookingInfomation.cs" />
     <Compile Include="Classes\Clients.cs" />
     <Compile Include="Classes\ConfigData.cs" />
     <Compile Include="Classes\Meals.cs" />
-    <Compile Include="Classes\NumberToWords.cs" />
     <Compile Include="Classes\ReadConfigFile.cs" />
     <Compile Include="Classes\Rooms.cs" />
     <Compile Include="Classes\RoomStatusUpdater.cs" />
@@ -187,6 +187,9 @@
     </Compile>
     <Compile Include="DatabaseControl\UsersView.xaml.cs">
       <DependentUpon>UsersView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ItemControl\BookingNumberWindow.xaml.cs">
+      <DependentUpon>BookingNumberWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ItemControl\Captcha.xaml.cs">
       <DependentUpon>Captcha.xaml</DependentUpon>
@@ -274,6 +277,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DatabaseControl\UsersView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ItemControl\BookingNumberWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

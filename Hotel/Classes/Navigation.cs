@@ -1,23 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Hotel.Classes
 {
     public class Navigation
     {
-        public void OpenAsNewPage(Window ShowWindow, Window CloseWindow)
+        // Метод для открытия нового окна и закрытия текущего окна
+        public void OpenAsNewPage(Window newWindow, Window currentWindow)
         {
-            ShowWindow.Show();
-            CloseWindow.Close();
+            if (newWindow == null || currentWindow == null)
+            {
+                throw new ArgumentNullException("Окно не должно быть null.");
+            }
+
+            newWindow.Show();
+            currentWindow.Close();
         }
 
-        public void OpenAsDialog(Window ShowDialogWindow)
+        // Метод для открытия окна в виде диалога
+        public void OpenAsDialog(Window dialogWindow)
         {
-            ShowDialogWindow.ShowDialog();
+            if (dialogWindow == null)
+            {
+                throw new ArgumentNullException("Окно не должно быть null.");
+            }
+
+            dialogWindow.ShowDialog();
         }
     }
 }

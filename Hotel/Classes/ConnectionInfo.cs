@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Windows;
+
 using MySql.Data.MySqlClient;
 
 namespace Hotel.Classes
@@ -8,28 +9,31 @@ namespace Hotel.Classes
     public class ConnectionInfo
     {
         // Строка подключения к базе данных
-        public string CONNECTION_STRING { get; private set; }
+        public string ConnectionString { get; private set; }
 
         // Конструктор, инициализирующий строку подключения
-        public ConnectionInfo(string info)
+        public ConnectionInfo(string connectionString)
         {
-            CONNECTION_STRING = info;
+            ConnectionString = connectionString;
         }
 
         // Метод для проверки подключения к базе данных
-        public bool CheckConnection(string connectionString)
+        public bool CheckConnection()
         {
             try
             {
-                using (var connection = new MySqlConnection(connectionString))
+                // Создание и открытие подключения
+                using (var connection = new MySqlConnection(ConnectionString))
                 {
                     connection.Open();
                 }
+                // Сообщение об успешном подключении
                 MessageBox.Show("Вы подключились к базе.", "ПОДКЛЮЧЕНИЕ К БАЗЕ", MessageBoxButton.OK, MessageBoxImage.Information);
                 return true;
             }
             catch (Exception e)
             {
+                // Сообщение об ошибке подключения
                 MessageBox.Show($"ОШИБКА:\n{e.Message}", "ПОДКЛЮЧЕНИЕ К БАЗЕ", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
@@ -38,15 +42,17 @@ namespace Hotel.Classes
         // Метод для получения данных из базы данных
         public DataTable GetData(string query)
         {
-            DataTable dataTable = new DataTable();
+            var dataTable = new DataTable();
 
             try
             {
-                using (var connection = new MySqlConnection(CONNECTION_STRING))
+                // Создание подключения и команды для выполнения запроса
+                using (var connection = new MySqlConnection(ConnectionString))
                 {
                     using (var command = new MySqlCommand(query, connection))
                     {
                         connection.Open();
+                        // Использование адаптера для заполнения DataTable
                         using (var adapter = new MySqlDataAdapter(command))
                         {
                             adapter.Fill(dataTable);
@@ -56,6 +62,7 @@ namespace Hotel.Classes
             }
             catch (Exception ex)
             {
+                // Сообщение об ошибке выполнения запроса
                 MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
@@ -67,22 +74,26 @@ namespace Hotel.Classes
         {
             try
             {
-                using (var connection = new MySqlConnection(CONNECTION_STRING))
+                // Создание подключения и команды для выполнения запроса
+                using (var connection = new MySqlConnection(ConnectionString))
                 {
                     using (var command = new MySqlCommand(query, connection))
                     {
+                        // Добавление параметров к команде, если они есть
                         if (parameters != null && parameters.Length > 0)
                         {
                             command.Parameters.AddRange(parameters);
                         }
 
                         connection.Open();
+                        // Выполнение команды
                         command.ExecuteNonQuery();
                     }
                 }
             }
             catch (Exception ex)
             {
+                // Сообщение об ошибке выполнения команды
                 MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -93,22 +104,26 @@ namespace Hotel.Classes
             int id = 0;
             try
             {
-                using (var connection = new MySqlConnection(CONNECTION_STRING))
+                // Создание подключения и команды для выполнения запроса
+                using (var connection = new MySqlConnection(ConnectionString))
                 {
                     using (var command = new MySqlCommand(query, connection))
                     {
+                        // Добавление параметров к команде, если они есть
                         if (parameters != null && parameters.Length > 0)
                         {
                             command.Parameters.AddRange(parameters);
                         }
 
                         connection.Open();
+                        // Выполнение команды и получение вставленного ID
                         id = Convert.ToInt32(command.ExecuteScalar());
                     }
                 }
             }
             catch (Exception ex)
             {
+                // Сообщение об ошибке выполнения команды
                 MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             return id;

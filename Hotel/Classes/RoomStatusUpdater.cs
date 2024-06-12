@@ -12,6 +12,7 @@ namespace Hotel.Classes
 
         public RoomStatusUpdater()
         {
+            // Инициализация строки подключения
             _db = new ConnectionInfo(_config.GetConnectionString());
         }
 
@@ -19,15 +20,15 @@ namespace Hotel.Classes
         {
             try
             {
-                // Get current date
+                // Текущая дата
                 DateTime currentDate = DateTime.Today;
                 string currentDateString = currentDate.ToString("yyyy-MM-dd");
 
-                // Get all bookings with departure date less than or equal to the current date
+                // Получение всех бронирований с датой выезда меньше или равной текущей дате
                 string query1 = $"SELECT room FROM Bookings WHERE departureDate <= '{currentDateString}'";
                 DataTable bookingsData = _db.GetData(query1);
 
-                // Create a list of room IDs that should be free
+                // Создание списка номеров, которые должны быть свободны
                 var roomsToBeFree = new List<int>();
 
                 if (bookingsData.Rows.Count > 0)
@@ -38,14 +39,11 @@ namespace Hotel.Classes
                         roomsToBeFree.Add(roomId);
                     }
 
-                    // Update the status of rooms to free
-                    foreach (int roomId in roomsToBeFree)
-                    {
-                        _db.ExecuteCommand($"UPDATE Rooms SET isFree = 't' WHERE roomID = {roomId}");
-                    }
+                    // Обновление статуса номеров на свободные
+                    UpdateRoomStatus(roomsToBeFree, true);
                 }
 
-                // Update the status of rooms that are currently booked
+                // Получение всех текущих бронирований
                 string query2 = $"SELECT room FROM Bookings WHERE arrivalDate <= '{currentDateString}' AND departureDate > '{currentDateString}'";
                 DataTable currentBookings = _db.GetData(query2);
 
@@ -59,15 +57,24 @@ namespace Hotel.Classes
                         roomsOccupied.Add(roomId);
                     }
 
-                    foreach (int roomId in roomsOccupied)
-                    {
-                        _db.ExecuteCommand($"UPDATE Rooms SET isFree = 'f' WHERE roomID = {roomId}");
-                    }
+                    // Обновление статуса номеров на занятые
+                    UpdateRoomStatus(roomsOccupied, false);
                 }
             }
             catch (Exception ex)
             {
+                // Обработка исключений и вывод сообщения об ошибке
                 MessageBox.Show(ex.Message, "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void UpdateRoomStatus(List<int> roomIds, bool isFree)
+        {
+            // Обновление статуса каждого номера
+            foreach (int roomId in roomIds)
+            {
+                string status = isFree ? "t" : "f";
+                _db.ExecuteCommand($"UPDATE Rooms SET isFree = '{status}' WHERE roomID = {roomId}");
             }
         }
     }

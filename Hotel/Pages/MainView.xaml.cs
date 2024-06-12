@@ -8,7 +8,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
+using Hotel.ItemControl;
+
 using Hotel.Classes;
+using MySql.Data.MySqlClient;
 
 namespace Hotel.Pages
 {
@@ -230,6 +233,73 @@ namespace Hotel.Pages
         private void Bookings_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
 
+        }
+
+        private void RegistrateBooking_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            BookingNumberWindow bookingNumber = new BookingNumberWindow();
+            if(bookingNumber.ShowDialog() == true)
+            {
+                var number = bookingNumber.BookingNumber;
+
+                if (!string.IsNullOrEmpty(number))
+                {
+                    var bookingData = _db.GetData("SELECT bookingID, room, bookingNumber, roomNumber, firstName, lastName, middleName, birthDate, phoneNumber, email " +
+                    "FROM Bookings " +
+                    "LEFT JOIN BookingClients ON BookingClients.booking = bookingID " +
+                    "LEFT JOIN Rooms ON room = roomID " +
+                    "LEFT JOIN Clients ON client=clientID " +
+                    $"WHERE bookingNumber='{number}';");
+
+                    ObservableCollection<BookingInfomation> bookingInfomations = new ObservableCollection<BookingInfomation>(
+                        from DataRow row in bookingData.Rows
+                        select new BookingInfomation
+                        {
+                            ID = Convert.ToInt32(row["bookingID"]),
+                            Number = row["bookingNumber"].ToString(),
+                            ClientFirstName = row["firstName"].ToString(),
+                            ClientLastName = row["lastName"].ToString(),
+                            ClientMiddleName = row["middleName"].ToString(),
+                            ClientPhoneNumber = row["phoneNumber"].ToString(),
+                            ClientEmail = row["email"].ToString(),
+                            ClientBirthDate = DateTime.Parse(Convert.ToString(row["birthDate"])).ToString("dd.MM.yyyy"),
+                            RoomNumber = row["roomNumber"].ToString(),
+                            RoomID = Convert.ToInt32(row["room"])
+                        });
+
+                    WordDocumentManager wordManager = new WordDocumentManager();
+
+                    foreach (var booking in bookingInfomations)
+                    {
+                        var clientProfileData = new Dictionary<string, string>
+                        {
+                            { "LastName", booking.ClientLastName },
+                            { "FirstName", booking.ClientFirstName },
+                            { "MiddleName", booking.ClientMiddleName },
+                            { "BirthDate", booking.ClientBirthDate },
+                            { "PhoneNumber", booking.ClientPhoneNumber },
+                            { "Email", booking.ClientEmail },
+                            { "RoomNumber", booking.RoomNumber }
+                        };
+                        string clientProfileTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory.Replace(@"\bin\Debug\", @"\Resources"), "ClientProfile.docx");
+                        string clientProfileOutputPath = $"ClientProfile_{booking.ClientLastName}_{booking.ClientFirstName}.docx";
+                        wordManager.FillTemplate(clientProfileTemplatePath, clientProfileOutputPath, clientProfileData);
+
+                        string queryRoom = "UPDATE rooms SET isFree=@isFree WHERE roomID=@roomID;";
+
+                        string connectionString = new ReadConfigFile().GetConnectionString();
+                        ConnectionInfo db = new ConnectionInfo(connectionString);
+
+                        MySqlParameter[] roomParameters = new MySqlParameter[]
+                        {
+                            new MySqlParameter("@isFree", 'f'),
+                            new MySqlParameter("@roomID", booking.RoomID)
+                        };
+
+                        db.ExecuteCommand(queryRoom, roomParameters);
+                    }
+                }
+            }
         }
     }
 }

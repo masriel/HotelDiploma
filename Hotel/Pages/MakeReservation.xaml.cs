@@ -27,37 +27,50 @@ namespace Hotel.Pages
 
         private void ReservationWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            //устанавливаем даты заезда и выезда по умолчанию
             SetDates();
+
+            //получаем свободные номера для заселения/бронирования
             PopulateFreeRoomsComboBox();
         }
 
+        //метод для заполнения ComboBox со свободными номерами
         private void PopulateFreeRoomsComboBox()
         {
-            var connection = new ConnectionInfo(new ReadConfigFile().GetConnectionString());
-            var roomData = connection.GetData("SELECT roomID, roomNumber, RoomTypes.roomType, roomCost FROM Rooms LEFT JOIN RoomTypes ON Rooms.roomType=roomTypeID WHERE isFree = 't'");
-
-            var freeRooms = from DataRow row in roomData.Rows
-                            select new Rooms
-                            {
-                                ID = Convert.ToInt32(row["roomID"]),
-                                Number = row["roomNumber"].ToString(),
-                                Type = row["roomType"].ToString(),
-                                Cost = row["roomCost"].ToString()
-                            };
-
-            _freeRooms = new ObservableCollection<Rooms>(freeRooms);
-            foreach (var room in freeRooms)
+            try
             {
-                SelectRoomBox.Items.Add($"{room.Number} | {room.Type} | {room.Cost} руб./ночь");
+                var connection = new ConnectionInfo(new ReadConfigFile().GetConnectionString());
+                var roomData = connection.GetData("SELECT roomID, roomNumber, RoomTypes.roomType, roomCost FROM Rooms LEFT JOIN RoomTypes ON Rooms.roomType=roomTypeID WHERE isFree = 't'");
+
+                var freeRooms = from DataRow row in roomData.Rows
+                                select new Rooms
+                                {
+                                    ID = Convert.ToInt32(row["roomID"]),
+                                    Number = row["roomNumber"].ToString(),
+                                    Type = row["roomType"].ToString(),
+                                    Cost = row["roomCost"].ToString()
+                                };
+
+                _freeRooms = new ObservableCollection<Rooms>(freeRooms);
+                foreach (var room in freeRooms)
+                {
+                    SelectRoomBox.Items.Add($"{room.Number} | {room.Type} | {room.Cost} руб./ночь");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке свободных номеров: {ex.Message}", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
+        //метод для установки дат по умолчанию
         private void SetDates()
         {
             ArrivalDatePicker.SelectedDate = DateTime.Now;
             DepartureDatePicker.SelectedDate = DateTime.Now.AddDays(1);
         }
 
+        //метод для добавления нового клиента
         private void AddClientButton_Click(object sender, RoutedEventArgs e)
         {
             // Открываем окно для добавления клиента
@@ -66,15 +79,16 @@ namespace Hotel.Pages
             {
                 // Добавляем клиента в список клиентов
                 var newClient = addClientWindow.NewClient;
-                ClientsList.Items.Add(new ListBoxItem 
-                { 
-                    Content = $"{newClient.LastName} {newClient.FisrtName} {newClient.MiddleName}", 
-                    Tag = newClient 
+                ClientsList.Items.Add(new ListBoxItem
+                {
+                    Content = $"{newClient.LastName} {newClient.FisrtName} {newClient.MiddleName}",
+                    Tag = newClient
                 });
                 _clients.Add(newClient);
             }
         }
 
+        //метод для добавления питания
         private void AddMealButton_Click(object sender, RoutedEventArgs e)
         {
             SelectMeal meal = new SelectMeal();
@@ -96,26 +110,36 @@ namespace Hotel.Pages
             }
         }
 
-
+        //метод добавления бронирования
         private void AddBookingButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                // Проверка выбора даты прибытия и отъезда
                 if (ArrivalDatePicker.SelectedDate == null || DepartureDatePicker.SelectedDate == null)
                 {
                     MessageBox.Show("Пожалуйста, выберите даты прибытия и отъезда.", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
+                // Проверка выбора номера
                 if (SelectRoomBox.SelectedIndex == -1)
                 {
                     MessageBox.Show("Пожалуйста, выберите номер.", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
+                // Проверка наличия хотя бы одного клиента
                 if (_clients.Count == 0)
                 {
                     MessageBox.Show("Пожалуйста, добавьте хотя бы одного клиента.", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                // Проверка на правильность выбора даты (дата отъезда должна быть позже даты прибытия)
+                if (DepartureDatePicker.SelectedDate <= ArrivalDatePicker.SelectedDate)
+                {
+                    MessageBox.Show("Дата отъезда должна быть позже даты прибытия.", "ОШИБКА", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -146,6 +170,19 @@ namespace Hotel.Pages
 
                 int bookingID = db.ExecuteInsertAndGetId(queryBooking, bookingParameters);
 
+                if (DateTime.Parse(arrivalDate) == DateTime.Now.Date)
+                {
+                    string queryRoom = "INSERT INTO rooms (isFree) VALUES (@isFree) WHERE roomID=@roomID; ";
+
+                    MySqlParameter[] roomParameters = new MySqlParameter[]
+                    {
+                        new MySqlParameter("@isFree", 'f'),
+                        new MySqlParameter("@roomID", roomID)
+                    };
+
+                    db.ExecuteInsertAndGetId(queryRoom, roomParameters);
+                }
+
                 // Вставка данных клиентов бронирования
                 foreach (int clientID in clientsID)
                 {
@@ -173,8 +210,6 @@ namespace Hotel.Pages
 
                 // Генерация документов
                 GenerateDocuments(bookingNumber, arrivalDate, departureDate, days, amount);
-
-                MessageBox.Show("Бронирование успешно добавлено.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
@@ -182,6 +217,7 @@ namespace Hotel.Pages
             }
         }
 
+        //формирование документов
         private void GenerateDocuments(string bookingNumber, string arrivalDate, string departureDate, int days, double amount)
         {
             WordDocumentManager wordManager = new WordDocumentManager();
@@ -211,8 +247,6 @@ namespace Hotel.Pages
                 wordManager.FillTemplate(voucherTemplatePath, voucherOutputPath, voucherData);
             }
 
-            var numbers = new NumberToWords();
-
             // Подготовка данных для чека об оплате
             var paymentReceiptData = new Dictionary<string, string>
             {
@@ -222,8 +256,8 @@ namespace Hotel.Pages
                 { "Year", DateTime.Now.ToString("yyyy") },
                 { "Clients", string.Join(", ", _clients.Select(c => c.LastName + " " + c.FisrtName)) },
                 { "RoomNumber", _freeRooms[SelectRoomBox.SelectedIndex].Number },
-                { "ArrivalDate", DateTime.Parse(arrivalDate).ToString("dd.MM.yyyyy") },
-                { "DepartureDate", DateTime.Parse(departureDate).ToString("dd.MM.yyyyy") },
+                { "ArrivalDate", DateTime.Parse(arrivalDate).ToString("dd.MM.yyyy") },
+                { "DepartureDate", DateTime.Parse(departureDate).ToString("dd.MM.yyyy") },
                 { "Days", days.ToString() },
                 { "RoomCost", _freeRooms[SelectRoomBox.SelectedIndex].Cost },
                 { "RoomAmount", (Convert.ToDouble(_freeRooms[SelectRoomBox.SelectedIndex].Cost) * days).ToString() },
@@ -257,32 +291,31 @@ namespace Hotel.Pages
             }
         }
 
-
+        //расчет итоговой суммы
         private double CalculateFinalAmount(int clients, Meals[] meals, int days)
         {
             double amount = 0;
-            double _roomCost = Convert.ToDouble(_freeRooms[SelectRoomBox.SelectedIndex].Cost);
-            double _mealsCost = 0;
+            double roomCost = Convert.ToDouble(_freeRooms[SelectRoomBox.SelectedIndex].Cost);
+            double mealsCost = meals.Sum(meal => meal.Cost * meal.Quantity);
 
-            foreach (var meal in meals)
-            {
-                _mealsCost += meal.Cost * meal.Quantity;
-            }
-
-            amount = (_roomCost * days + _mealsCost) * clients;
+            // Стоимость проживания и питания на всех клиентов
+            amount = (roomCost * days + mealsCost) * clients;
 
             return amount;
         }
 
+        //генерация номера бронирования
         private string GenerateBookingNumber()
         {
-            char firstLetter = (char)('A' + new Random().Next(0, 26));
-            char lastLetter = (char)('A' + new Random().Next(0, 26));
-            string digits = new Random().Next(0, 1000).ToString("D3");
+            var random = new Random();
+            char firstLetter = (char)('A' + random.Next(0, 26));
+            char lastLetter = (char)('A' + random.Next(0, 26));
+            string digits = random.Next(0, 1000).ToString("D3");
 
             return $"{firstLetter}{digits}{lastLetter}";
         }
 
+        //удаления клиента из бронирования
         private void ClientsList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (ClientsList.SelectedItem != null)
@@ -293,6 +326,7 @@ namespace Hotel.Pages
             }
         }
 
+        //удаление питания из бронирования
         private void MealsList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (MealsList.SelectedItem != null)
